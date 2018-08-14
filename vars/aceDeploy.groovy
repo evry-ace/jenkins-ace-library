@@ -7,6 +7,7 @@ def call(global, ace, environment, opts = [:]) {
   def dryrun = opts.dryrun ?: false
   def wait = opts.containsKey('wait') ? opts.wait : true
   def timeout = opts.timeout ?: 600
+  def dockerImage = opts.dockerImage ?: null
   def dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
 
   def kubectlVersion = opts.kubectlVersion ?: 'v1.6.0'
@@ -14,6 +15,9 @@ def call(global, ace, environment, opts = [:]) {
 
   // Instanciate AceUtils with global configuration
   def utils = new AceUtils(global)
+
+  // Dereive Kuberentes Cluster from Environment
+  def cluster = utils.envCluster(environment)
 
   // Make a copy of input values to prevent reuse of value HashMap in Jenkins
   writeYaml file: '.helmdeploytemp.yaml', data: ace
@@ -47,6 +51,8 @@ def call(global, ace, environment, opts = [:]) {
     throw new IllegalArgumentException("dockerImage can not be empty")
   }
 
+  def dockerRegistry = dockerSet ? cluster.registry : ''
+
   // Kubernetes namespace for Helm chart
   if (!values.namespace) { throw new IllegalArgumentException("namespace can not be empty") }
   namespace = utils.envNamespace(environment, values.namespace, values.namespaceEnvify)
@@ -60,6 +66,11 @@ def call(global, ace, environment, opts = [:]) {
   if (dockerImage) {
     values.helm.default.image = values.helm.default.image ?: [:]
     values.helm.default.image.image = values.dockerImage ?: values.helm.default.image.image
+  }
+
+  // Docker Registry
+  if (dockerRegistry) {
+    values.helm.default.dockerRegistry = dockerRegistry
   }
 
   // Helm Release Name
@@ -105,9 +116,6 @@ def call(global, ace, environment, opts = [:]) {
 
   def deploy = values.deploy[environment] ?: [:]
 
-  // Dereive Kuberentes Cluster from Environment
-  def cluster = utils.envCluster(environment)
-
   // Allow Kubernetes Namespace from Environment
   namespace = deploy.namespace ?: namespace
 
@@ -140,9 +148,18 @@ def call(global, ace, environment, opts = [:]) {
   writeYaml file: "${helmPath}/default.yaml", data: values.helm.default
   writeYaml file: "${helmPath}/${environment}.yaml", data: deploy.values
 
-  def credId = cluster.credential
+  def credId  = cluster.credential
+  def regId   = cluster.registry
   def credVar = 'KUBECONFIG'
 
+  // Push Docker Image to cluster defined registry
+  if (dockerImage != null) {
+    withDockerRegistry([credentialsId: regId, url: "https://${regId}"]) {
+      dockerImage.push()
+    }
+  }
+
+  // Deploy to specified cluter environment
   withCredentials([file(credentialsId: credId, variable: credVar)]) {
     docker.image("lachlanevenson/k8s-kubectl:${kubectlVersion}").inside() {
       script = '''

@@ -22,7 +22,7 @@ def call(global, Map opts = [:], body) {
           body.global = global
 
           if (dockerSet) {
-            body.ace.dockerImage = new Docker(this).image()
+            body.ace.dockerImageName = new Docker(this).image()
           }
 
           if (body.ace?.contact?.slack_notifications) {
@@ -34,8 +34,12 @@ def call(global, Map opts = [:], body) {
           }
 
           // Wrap aceDeploy with global and local config
-          body.deploy = { deployEnv, deployOpts = [:] ->
-            aceDeploy(body.global, body.ace, deployEnv, deployOpts + [slack: body.slack])
+          body.deploy = { dImage, dEnv, dOpts = [:] ->
+            dOpts = dOpts + [
+              dockerImage: dImage,
+              slack: body.slack,
+            ]
+            aceDeploy(body.global, body.ace, dEnv, dOpts)
           }
         }
 
