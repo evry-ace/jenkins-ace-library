@@ -149,15 +149,7 @@ def call(global, ace, environment, opts = [:]) {
   writeYaml file: "${helmPath}/${environment}.yaml", data: deploy.values
 
   def credId  = cluster.credential
-  def regId   = cluster.registry
   def credVar = 'KUBECONFIG'
-
-  // Push Docker Image to cluster defined registry
-  if (dockerImage != null) {
-    withDockerRegistry([credentialsId: regId, url: "https://${regId}"]) {
-      dockerImage.push()
-    }
-  }
 
   // Deploy to specified cluter environment
   withCredentials([file(credentialsId: credId, variable: credVar)]) {

@@ -3,12 +3,12 @@
 import no.ace.Slack
 import no.ace.Docker
 
-def call(global, Map opts = [:], body) {
-  def buildAgent = opts.buildAgent ?: 'jenkins-docker-3'
-  def dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
-  def dockerNameOnly = opts.dockerNameOnly ?: false
-  def aceInit = opts.containsKey('aceInit') ? opts.aceInit : true
-  def aceFile = opts.aceFile ?: 'ace.yaml'
+def call(global, Map options = [:], body) {
+  def buildAgent = options.buildAgent ?: 'jenkins-docker-3'
+  def dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
+  def dockerNameOnly = options.dockerNameOnly ?: false
+  def aceInit = options.containsKey('aceInit') ? options.aceInit : true
+  def aceFile = options.aceFile ?: 'ace.yaml'
 
   node(buildAgent) {
     buildWorkspace {
@@ -33,13 +33,26 @@ def call(global, Map opts = [:], body) {
             body.slack.notifyStarted()
           }
 
-          // Wrap aceDeploy with global and local config
-          body.deploy = { dImage, dEnv, dOpts = [:] ->
-            dOpts = dOpts + [
-              dockerImage: dImage,
-              slack: body.slack,
-            ]
-            aceDeploy(body.global, body.ace, dEnv, dOpts)
+          // Ace Docker Image Build
+          body.build = { path = '.', opts = [:] ->
+            path = path ?: '.'
+            opts = opts ?: [:]
+            opts << [slack: body.slack]
+            return aceBuild(body.global, body.ace.dockerImageName, path, opts)
+          }
+
+          // Ace Docker Image Push
+          body.push = { env, image, dryrun, opts = [:] ->
+            opts = opts ?: [:]
+            opts << [slack: body.slack, dryrun: dryrun]
+            acePush(body.global, image, env, opts)
+          }
+
+          // Ace Helm Deploy
+          body.deploy = { env, dryrun, opts = [:] ->
+            opts = opts ?: [:]
+            opts << [slack: body.slack, dryrun: dryrun]
+            aceDeploy(body.global, body.ace, env, opts)
           }
         }
 
