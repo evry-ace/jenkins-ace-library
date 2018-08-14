@@ -7,7 +7,6 @@ def call(global, ace, environment, opts = [:]) {
   def dryrun = opts.dryrun ?: false
   def wait = opts.containsKey('wait') ? opts.wait : true
   def timeout = opts.timeout ?: 600
-  def dockerImage = opts.dockerImage ?: null
   def dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
 
   def kubectlVersion = opts.kubectlVersion ?: 'v1.6.0'
@@ -46,7 +45,7 @@ def call(global, ace, environment, opts = [:]) {
   if (chartVersion == '') { throw new IllegalArgumentException("chartVersion can not be empty") }
 
   // Docker Image to inject to Helm chart
-  def dockerImage = values.dockerImage ?: values.helm?.default?.image?.image ?: ''
+  def dockerImage = values.dockerImageName ?: values.helm?.default?.image?.image ?: ''
   if (dockerSet && dockerImage == '') {
     throw new IllegalArgumentException("dockerImage can not be empty")
   }
@@ -65,7 +64,7 @@ def call(global, ace, environment, opts = [:]) {
   // Docker Image
   if (dockerImage) {
     values.helm.default.image = values.helm.default.image ?: [:]
-    values.helm.default.image.image = values.dockerImage ?: values.helm.default.image.image
+    values.helm.default.image.image = dockerImage ?: values.helm.default.image.image
   }
 
   // Docker Registry
