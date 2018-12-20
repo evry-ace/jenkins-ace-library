@@ -1,19 +1,26 @@
 #!/usr/bin/env groovy
 
-import no.ace.AceUtils
+import no.ace.Config
 
-def call(global, image, env, opts = [:]) {
+def call(config, env, image, opts = [:]) {
   def dryrun = opts.dryrun ?: false
 
-  def utils = new AceUtils(global)
-  def cluster = utils.envCluster(env)
-  def registry = cluster.registry
+  def ace = Config.parse(config, env)
+
+  def registry = ace.helm.registry
+  def name = ace.helm.image
+
+  println "Pushing to Docker Registry"
 
   withDockerRegistry([credentialsId: registry, url: "https://${registry}"]) {
+    println "image=${image}, imageName=${image.imageName()}, imageId=${image.id}"
+    println "registry=${registry}, helmName=${name}"
+
     if (dryrun) {
       println "Docker Push skipped due to dryrun=true"
     } else {
-      image.push()
+      sh "docker tag ${name} ${registry}/${name}"
+      sh "docker push ${registry}/${name}"
     }
   }
 }

@@ -3,10 +3,10 @@
 import no.ace.Slack
 import no.ace.Docker
 
-def call(global, Map options = [:], body) {
+def call(Map options = [:], body) {
+  def debug = options.containsKey('debug') ? options.debug : true
   def buildAgent = options.buildAgent ?: 'jenkins-docker-3'
   def dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
-  def dockerNameOnly = options.dockerNameOnly ?: false
   def aceInit = options.containsKey('aceInit') ? options.aceInit : true
   def aceFile = options.aceFile ?: 'ace.yaml'
 
@@ -19,10 +19,9 @@ def call(global, Map options = [:], body) {
 
         if (aceInit) {
           body.ace = readYaml file: aceFile
-          body.global = global
 
           if (dockerSet) {
-            body.ace.dockerImageName = new Docker(this).image()
+            body.ace.helm.image = new Docker(this).image()
           }
 
           if (body.ace?.contact?.slack_notifications) {
@@ -34,25 +33,28 @@ def call(global, Map options = [:], body) {
           }
 
           // Ace Docker Image Build
-          body.build = { path = '.', opts = [:] ->
+          body.dockerBuild = { path = '.', opts = [:] ->
             path = path ?: '.'
             opts = opts ?: [:]
-            opts << [slack: body.slack]
-            return aceBuild(body.global, body.ace.dockerImageName, path, opts)
+            opts << [slack: body.slack, debug: debug]
+
+            body.image = aceBuild(body.ace.helm.image, path, opts)
           }
 
           // Ace Docker Image Push
-          body.push = { env, image, dryrun, opts = [:] ->
+          body.dockerPush = { env = '', opts = [:] ->
             opts = opts ?: [:]
-            opts << [slack: body.slack, dryrun: dryrun]
-            acePush(body.global, image, env, opts)
+            opts << [slack: body.slack, debug: debug]
+
+            acePush(body.ace, env, body.image, opts)
           }
 
           // Ace Helm Deploy
-          body.deploy = { env, dryrun, opts = [:] ->
+          body.deploy = { env, opts = [:] ->
             opts = opts ?: [:]
-            opts << [slack: body.slack, dryrun: dryrun]
-            aceDeploy(body.global, body.ace, env, opts)
+            opts << [slack: body.slack, debug: debug]
+
+            aceDeploy(body.ace, env, opts)
           }
         }
 

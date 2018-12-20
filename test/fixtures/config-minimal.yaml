@@ -1,0 +1,50 @@
+name: jenkins-test
+
+# Contact Information
+contact:
+  wiki_url: https://edbergobergen.jira.com/wiki/spaces/DEV
+  jira_url: https://edbergobergen.jira.com/browse/DEV
+  responsible: DevOps
+  slack_notifications: "#devops-notifications"
+  slack_alerts: "#devops-alerts"
+
+# Helm Configuration
+helm:
+  # name: $name - $environment
+  chart: ace/nodejs
+  # repo: https://evry-ace.github.io/helm-charts
+  # repoName: ace
+  version: ^1.0.0
+
+  cluster: kubernetes.ace.alpha
+  # namespace:
+  registry: k8sinfra.azurecr.io
+
+  values:
+    foo: bar
+    bar: foo
+
+environments:
+  dev:
+    # cluster:
+    namespace: dev
+    # registry:
+    #
+    values:
+      bar: dev
+
+  test:
+    # cluster:
+    namespace: test
+    # registry:
+    #
+    values:
+      bar: test
+
+  prod:
+    # cluster:
+    namesapce: prod
+    # registry:
+    #
+    values:
+      bar: prod
