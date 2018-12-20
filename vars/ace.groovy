@@ -5,13 +5,14 @@ import no.ace.Docker
 
 def call(Map options = [:], body) {
   def debug = options.containsKey('debug') ? options.debug : true
+  def workspace = options.workspace ?: '/home/jenkins/workspace'
   def buildAgent = options.buildAgent ?: 'jenkins-docker-3'
   def dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
   def aceInit = options.containsKey('aceInit') ? options.aceInit : true
   def aceFile = options.aceFile ?: 'ace.yaml'
 
   node(buildAgent) {
-    buildWorkspace {
+    buildWorkspace([workspace: workspace]) {
       try {
         println "Dedicated to the original ACE, by Alan Turing"
 
