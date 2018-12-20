@@ -10,8 +10,13 @@ def call(config, env, opts = [:]) {
   def timeout = opts.timeout ?: 600
   def dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
 
+  def kubectlImage = opts.kubectlImage ?: 'lachlanevenson/k8s-kubectl'
   def kubectlVersion = opts.kubectlVersion ?: 'v1.6.0'
+  def kubectlOpts = opts.kubectlOpts ?: "--entrypoint=''"
+
+  def helmImage = opts.helmImage ?: 'lachlanevenson/k8s-helm'
   def helmVersion = opts.helmVersion ?: 'v2.6.0'
+  def helmOpts = opts.helmOpts ?: "--entrypoint=''"
   def helmValuesFile = '.ace/values.yaml'
 
   def ace = Config.parse(config, env)
@@ -52,7 +57,7 @@ def call(config, env, opts = [:]) {
 
   withCredentials([file(credentialsId: credId, variable: credVar)]) {
     // Get Helm Version
-    docker.image("lachlanevenson/k8s-kubectl:${kubectlVersion}").inside() {
+    docker.image("${kubectlImage}:${kubectlVersion}").inside(kubectlOpts) {
       script = '''
         kubectl get deploy -n kube-system -o wide \
           | grep tiller \
@@ -64,7 +69,7 @@ def call(config, env, opts = [:]) {
     }
 
     // Deploy Helm Release
-    docker.image("lachlanevenson/k8s-helm:${helmVersion}").inside() {
+    docker.image("${helmImage}:${helmVersion}").inside(helmOpts) {
       sh """
         set -u
         set -e
