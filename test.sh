@@ -4,7 +4,4 @@ set -e
 
 COMPOSE=docker-compose
 
-for file in test/*.groovy; do
-  echo "Running $file..."
-  ${COMPOSE} run --rm groovy $file
-done
+${COMPOSE} run --rm groovy test/AllTestsRunner.groovy
