@@ -1,60 +1,54 @@
 #!/usr/bin/env groovy
+
 package no.ace
 
 class Docker implements Serializable {
-  Closure script
-  Map opts
-  Boolean nameOnly
+  def script
+  def opts
+  def nameOnly
 
-  Docker(Closure script, Map opts = [:]) {
+  Docker(script, Map opts = [:]) {
     this.script = script
     this.opts = opts
 
-    this.nameOnly = opts.nameOnly ?: false
+    this.nameOnly = opts['nameOnly'] ?: false
   }
 
-  String imageName() {
-    List list = this.script.env.JOB_NAME.split('/')
-    String name
+  def imageName() {
+    def list = this.script.env.JOB_NAME.split('/')
 
     if (list.size() == 3) {
       if (this.nameOnly) {
-        name = this.scrubName(list[1])
+        return this.scrubName(list[1])
       } else {
-        name = this.scrubName("${list[0]}/${list[1]}".replaceAll(/[^A-Za-z0-9-\/]/, '-'))
+        return this.scrubName("${list[0]}/${list[1]}".replaceAll(/[^A-Za-z0-9-\/]/, '-'))
       }
     } else {
-      name = this.scrubName(this.script.env.JOB_NAME)
+      return this.scrubName(this.script.env.JOB_NAME)
     }
-
-    return name
   }
 
-  String branchTag() {
+  def branchTag() {
     return scrub(this.script.env.BRANCH_NAME)
   }
 
-  String buildTag() {
+  def buildTag() {
     return "${scrub(this.script.env.BRANCH_NAME)}-${this.script.env.BUILD_NUMBER}"
   }
 
-  String scrub(String str) {
+  def scrub(String str) {
     return str.toLowerCase().replaceAll(/[^a-z0-9]/, '-')
   }
 
-  String scrubName(String str) {
+  def scrubName(String str) {
     return str.toLowerCase().replaceAll(/[^a-z0-9\/]/, '-')
   }
 
-  String image(String registry = '') {
-    String image
-
+  def image(String registry = '') {
     if (registry != '') {
-      image = "${registry}/${imageName()}:${buildTag()}"
+      return "${registry}/${imageName()}:${buildTag()}"
     } else {
-      image = "${imageName()}:${buildTag()}"
+      return "${imageName()}:${buildTag()}"
     }
-
-    return image
   }
 }
