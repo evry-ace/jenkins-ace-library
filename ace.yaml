@@ -1,0 +1,9 @@
+name: jenkins-ace-library
+
+# Contact Information
+contact:
+  wiki_url: https://edbergobergen.jira.com/wiki/spaces/DEV
+  jira_url: https://edbergobergen.jira.com/browse/DEV
+  responsible: DevOps
+  slack_notifications: "#devops-notifications"
+  slack_alerts: "#devops-alerts"

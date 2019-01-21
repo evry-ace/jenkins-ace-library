@@ -15,7 +15,7 @@ services:
     volumes:
     - ".:/usr/src/app"
     network_mode: bridge
-    entrypoint: groovy -classpath src/:vars/
+    entrypoint: groovy -classpath src/:vars/:test/
 
   groovyc:
     image: groovy:alpine
