@@ -8,12 +8,22 @@ ace([dockerSet: false]) {
     def groovylintOpts = "--entrypoint=''"
 
     docker.image("${groovylintImage}:${groovylintVersion}").inside(groovylintOpts) {
-      script = '''
+      sh '''
         python3 /opt/run_codenarc.py \
          -report=console \
          -includes="**/*.groovy"
       '''
     }
+
+    publishHTML(target: [
+      allowMissing: false,
+      alwaysLinkToLastBuild: true,
+      keepAll: true,
+      reportDir: '',
+      reportFiles: 'codenarc-output.html,groovylint-errors.html',
+      reportName: 'Groovy Lint Results',
+      reportTitles: ''
+    ])
   }
 
   stage('Test') {
