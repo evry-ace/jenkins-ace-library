@@ -22,7 +22,7 @@ ace([dockerSet: false]) {
     def groovyOpts = "--entrypoint=''"
 
     docker.image("${groovyImage}:${groovyVersion}").inside(groovyOpts) {
-      sh 'groovy -classpath src/:vars/'
+      sh 'groovy -classpath src/:vars/:test/ test/AllTestsRunner.groovy'
     }
   }
 }
