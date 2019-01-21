@@ -2,11 +2,11 @@
 package no.ace
 
 class Docker implements Serializable {
-  Closure script
+  Object script
   Map opts
   Boolean nameOnly
 
-  Docker(Closure script, Map opts = [:]) {
+  Docker(Object script, Map opts = [:]) {
     this.script = script
     this.opts = opts
 

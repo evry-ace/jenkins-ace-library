@@ -4,11 +4,11 @@ package no.ace
 // https://jenkins.io/doc/pipeline/steps/slack/
 
 class Slack implements Serializable {
-  Closure script
+  Object script
   String channel
   String alerts
 
-  Slack(Closure script, String channel, String alerts = null) {
+  Slack(Object script, String channel, String alerts = null) {
     this.script = script
     this.channel = channel
     this.alerts = alerts
