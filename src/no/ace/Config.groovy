@@ -39,7 +39,7 @@ class Config {
 
   static Map clone(Map orig) {
     ByteArrayOutputStream bos = new ByteArrayOutputStream()
-    ObjectInputStream oos = new ObjectOutputStream(bos)
+    ObjectOutputStream oos = new ObjectOutputStream(bos)
 
     oos.writeObject(orig); oos.flush()
 
