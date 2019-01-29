@@ -33,6 +33,16 @@ def call(Map options = [:], body) {
             body.slack.notifyStarted()
           }
 
+          if (body.ace?.contact?.teams_notifications) {
+            def webhookSecret = body.ace.contact.teams_webhook
+
+            body.teamsNotify = { msg, status ->
+              withCredentials([string(credentialsId: webhookSecret, variable: 'TEAMS_SECRET')]) {
+                office365ConnectorSend message: msg, status: status, "${env.TEAMS_SECRET}"
+              }
+            }
+          }
+
           // Ace Docker Image Build
           body.dockerBuild = { path = '.', opts = [:] ->
             path = path ?: '.'
