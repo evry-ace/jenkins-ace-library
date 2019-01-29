@@ -25,22 +25,25 @@ def call(Map options = [:], body) {
             body.ace.helm.image = new Docker(this).image()
           }
 
-          if (body.ace?.contact?.slack_notifications) {
-            def channel = body.ace.contact.slack_notifications
-            def alerts = body.ace.contact.slack_alerts ?: channel
+          if (body.ace?.contact?.slack ||| body.ace?.contact?.slack_notifications) {
+            def notifications = body.ace.contact.slack?.notifications ?: body.ace.contact.slack_notifications
+            def alerts = body.ace.contact.slack?.alerts ?: body.ace.contact.slack_alerts ?: channel
 
-            body.slack = new Slack(this, channel, alerts)
-            body.slack.notifyStarted()
-          }
-
-          if (body.ace?.contact?.teams_notifications) {
-            def webhookSecret = body.ace.contact.teams_webhook
-
-            body.teamsNotify = { msg, status ->
-              withCredentials([string(credentialsId: webhookSecret, variable: 'TEAMS_SECRET')]) {
-                office365ConnectorSend message: msg, status: status, "${env.TEAMS_SECRET}"
-              }
+            body.chat = new Slack(this, notifications, alerts)
+            body.chat.notifyStarted()
+            
+            // Backwards compability with old slack_notifications definition
+            if (body.ace.contact.slack_notifications) {
+              body.slack = body.chat
+              println "[DEPRECTION WARNING] contact.slack_notifications has been deprectated"
+              println "[DEPRECTION WARNING] use contact.slack.notifications instead!"
             }
+          } else if (body.ace?.contact?.teams) {
+            def notifications = body.ace.contact.teams.notifications ?: 'TeamsNotificationWebhook'
+            def alerts = body.ace.contact.teams.alerts ?: notifications
+            
+            body.chat = new Team(this, notifications, alerts)
+            body.chat.notifyStarted()
           }
 
           // Ace Docker Image Build
@@ -71,8 +74,8 @@ def call(Map options = [:], body) {
 
         body()
       } catch (err) {
-        if (body.getBinding().hasVariable('slack')) {
-          body.slack.notifyFailed()
+        if (body.getBinding().hasVariable('chat')) {
+          body.chat.notifyFailed()
         }
         throw err
       } finally {
