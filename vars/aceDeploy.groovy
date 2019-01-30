@@ -43,10 +43,10 @@ def call(config, envName, opts = [:]) {
     }
   }
 
-  print env
+  print opts.env
 
   if (!ace.helm.name) {
-    ace.helm.name = env.JOB_BASE_NAME
+    ace.helm.name = opts.env.JOB_BASE_NAME
     ace.helm.nameEnvify = true
   }
 
