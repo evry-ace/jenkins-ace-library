@@ -2,7 +2,7 @@
 
 import no.ace.Config
 
-def call(config, env, opts = [:]) {
+def call(config, envName, opts = [:]) {
   def acefile = opts.acefile ?: 'ace.yaml'
   def debug = opts.containsKey('debug') ? opts.debug : true
   def dryrun = opts.dryrun ?: false
@@ -19,7 +19,15 @@ def call(config, env, opts = [:]) {
   def helmOpts = opts.helmOpts ?: "--entrypoint=''"
   def helmValuesFile = '.ace/values.yaml'
 
-  def ace = Config.parse(config, env)
+  def (org, repo, branch) = env.JOB_NAME.split('/')
+  println "org=${org}, repo=${repo}, branch=${branch}"
+
+  // @TODO this logic could be moved to the Config Class
+  config.name = config.name ?: repo
+
+  def ace = Config.parse(config, envName)
+  ace.helm = ace.helm ?: [:]
+  ace.helm.values = ace.helm.values ?: [:]
 
   if (dockerSet) {
     ace.helm.values.image = ace.helm.values.image ?: [:]
@@ -73,6 +81,8 @@ def call(config, env, opts = [:]) {
       sh """
         set -u
         set -e
+
+        env
 
         # Set Helm Home
         export HELM_HOME=\$(pwd)
