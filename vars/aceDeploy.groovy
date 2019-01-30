@@ -83,6 +83,8 @@ def call(config, envName, opts = [:]) {
         set -u
         set -e
 
+        env
+
         # Set Helm Home
         export HELM_HOME=\$(pwd)
 
