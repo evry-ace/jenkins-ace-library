@@ -19,6 +19,12 @@ def call(config, envName, opts = [:]) {
   def helmOpts = opts.helmOpts ?: "--entrypoint=''"
   def helmValuesFile = '.ace/values.yaml'
 
+  def (org, repo, branch) = env.JOB_NAME.split('/')
+  println "org=${org}, repo=${repo}, branch=${branch}"
+
+  // @TODO this logic could be moved to the Config Class
+  config.name = config.name ?: repo
+
   def ace = Config.parse(config, envName)
   ace.helm = ace.helm ?: [:]
   ace.helm.values = ace.helm.values ?: [:]
@@ -43,15 +49,7 @@ def call(config, envName, opts = [:]) {
     }
   }
 
-  if (!ace.helm.name) {
-    def (org, repo, branch) = env.JOB_NAME.split('/')
-    println "org=${org}, repo=${repo}, branch=${branch}"
-
-    ace.helm.name = repo
-    ace.helm.nameEnvify = true
-  }
-
-  def helmName = ace.helm.nameEnvify ? "${ace.helm.name}-${envName}" : ace.helm.name
+  def helmName = ace.helm.name
   def helmNamespace = ace.helm.namespace
   def helmRepo = ace.helm.repo
   def helmRepoName = ace.helm.repoName

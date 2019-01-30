@@ -37,7 +37,7 @@ def call(Map options = [:], body) {
           body.dockerBuild = { path = '.', opts = [:] ->
             path = path ?: '.'
             opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug, env: env]
+            opts << [slack: body.slack, debug: debug]
 
             body.image = aceBuild(body.ace.helm.image, path, opts)
           }
@@ -45,7 +45,7 @@ def call(Map options = [:], body) {
           // Ace Docker Image Push
           body.dockerPush = { envName = '', opts = [:] ->
             opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug, env: env]
+            opts << [slack: body.slack, debug: debug]
 
             acePush(body.ace, envName, body.image, opts)
           }
@@ -53,7 +53,7 @@ def call(Map options = [:], body) {
           // Ace Helm Deploy
           body.deploy = { envName, opts = [:] ->
             opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug, env: env]
+            opts << [slack: body.slack, debug: debug]
 
             aceDeploy(body.ace, envName, opts)
           }
