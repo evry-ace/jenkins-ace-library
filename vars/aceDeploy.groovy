@@ -43,10 +43,11 @@ def call(config, envName, opts = [:]) {
     }
   }
 
-  print opts.env
-
   if (!ace.helm.name) {
-    ace.helm.name = opts.env.JOB_BASE_NAME
+    def (org, repo, branch) = env.JOB_NAME.split('/')
+    println "org=${org}, repo=${repo}, branch=${branch}"
+
+    ace.helm.name = repo
     ace.helm.nameEnvify = true
   }
 
