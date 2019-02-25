@@ -9,7 +9,7 @@ ace([dockerSet: false]) {
 
     docker.image("${groovylintImage}:${groovylintVersion}").inside(groovylintOpts) {
       sh '''
-        python3 /opt/run_codenarc.py \
+        python3 /opt/run_codenarc.py -- \
          -report=console \
          -includes="**/*.groovy"
       '''
