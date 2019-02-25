@@ -2,6 +2,7 @@ import junit.framework.Test
 import junit.framework.TestResult
 import junit.textui.TestRunner
 
+@SuppressWarnings(['SystemExit'])
 class AllTests {
   static Test suite() {
     GroovyTestSuite allTests = new GroovyTestSuite()
@@ -12,8 +13,11 @@ class AllTests {
 
     return allTests
   }
+
+  static void exit(boolean success) {
+    System.exit(success ? 0 : 1)
+  }
 }
 
-@SuppressWarnings(['SystemExit'])
 TestResult result = TestRunner.run(AllTests.suite())
-System.exit(result.wasSuccessful() ? 0 : 1)
+AllTests.exit(result.wasSuccessful())
