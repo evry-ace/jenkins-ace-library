@@ -1,17 +1,16 @@
-import groovy.util.GroovyTestSuite
 import junit.framework.Test
 import junit.textui.TestRunner
 
 class AllTests {
-   static Test suite() {
-      def allTests = new GroovyTestSuite()
+  static Test suite() {
+    GroovyTestSuite allTests = new GroovyTestSuite()
 
-      allTests.addTestSuite(ConfigTest.class)
-      allTests.addTestSuite(SlackTest.class)
-      allTests.addTestSuite(DockerTest.class)
+    allTests.addTestSuite(ConfigTest)
+    allTests.addTestSuite(SlackTest)
+    allTests.addTestSuite(DockerTest)
 
-      return allTests
-   }
+    return allTests
+  }
 }
 
 TestRunner.run(AllTests.suite())
