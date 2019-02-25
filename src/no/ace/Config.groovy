@@ -30,7 +30,7 @@ class Config {
       name: "${name}-${env}",
       repo: 'https://evry-ace.github.io/helm-charts',
       repoName: 'ace',
-      values: [],
+      values: [:],
     ]
   }
 
