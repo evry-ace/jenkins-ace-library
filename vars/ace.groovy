@@ -3,18 +3,18 @@
 import no.ace.Slack
 import no.ace.Docker
 
-def call(Map options = [:], body) {
-  def debug = options.containsKey('debug') ? options.debug : true
-  def workspace = options.workspace ?: '/home/jenkins/workspace'
-  def buildAgent = options.buildAgent ?: 'jenkins-docker-3'
-  def dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
-  def aceInit = options.containsKey('aceInit') ? options.aceInit : true
-  def aceFile = options.aceFile ?: 'ace.yaml'
+void call(Map options = [:], Object body) {
+  Boolean debug = options.containsKey('debug') ? options.debug : true
+  String workspace = options.workspace ?: '/home/jenkins/workspace'
+  String buildAgent = options.buildAgent ?: 'jenkins-docker-3'
+  Boolean dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
+  Boolean aceInit = options.containsKey('aceInit') ? options.aceInit : true
+  String aceFile = options.aceFile ?: 'ace.yaml'
 
   node(buildAgent) {
     buildWorkspace([workspace: workspace]) {
       try {
-        println "Dedicated to the original ACE, by Alan Turing"
+        println 'Dedicated to the original ACE, by Alan Turing'
 
         checkout scm
 
@@ -26,8 +26,8 @@ def call(Map options = [:], body) {
           }
 
           if (body.ace?.contact?.slack_notifications) {
-            def channel = body.ace.contact.slack_notifications
-            def alerts = body.ace.contact.slack_alerts ?: channel
+            String channel = body.ace.contact.slack_notifications
+            String alerts = body.ace.contact.slack_alerts ?: channel
 
             body.slack = new Slack(this, channel, alerts)
             body.slack.notifyStarted()

@@ -1,7 +1,7 @@
 #!/usr/env/groovy
 
-def call(commit = '') {
-  def rawUrl = sh(
+String call(String commit = '') {
+  String rawUrl = sh(
     script: 'git config remote.origin.url',
     returnStdout: true
   )?.trim()
@@ -23,11 +23,11 @@ def call(commit = '') {
       .split('/')
   }
 
-  def url = "https://${list[0]}/projects/${list[1]}/repos/${list[2]}/browse"
+  String url = "https://${list[0]}/projects/${list[1]}/repos/${list[2]}/browse"
 
   if (commit != '') {
     return "${url}?at=${commit}"
-  } else {
-    return url
   }
+
+  return url
 }

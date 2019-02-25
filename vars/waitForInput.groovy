@@ -1,10 +1,10 @@
 #!/usr/bin/env groovy
 
-def call(message, opts = [:]) {
-  def timeout = opts['timeout'] ?: 0
-  def timeoutUnit = opts['timeoutUnit'] ?: 'MINUTES'
+void call(String message, Map opts = [:]) {
+  Integer timeout = opts['timeout'] ?: 0
+  String timeoutUnit = opts['timeoutUnit'] ?: 'MINUTES'
 
-  def slack = opts.slack ?: null
+  Object slack = opts.slack ?: null
 
   milestone()
 
