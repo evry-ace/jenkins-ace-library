@@ -10,6 +10,7 @@ class AllTests {
     allTests.addTestSuite(ConfigTest)
     allTests.addTestSuite(SlackTest)
     allTests.addTestSuite(DockerTest)
+    allTests.addTestSuite(TerraformTest)
 
     return allTests
   }
