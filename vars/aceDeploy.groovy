@@ -2,6 +2,7 @@
 
 import no.ace.Config
 
+@SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
 void call(Map config, String envName, Map opts = [:]) {
   // String  acefile = opts.acefile ?: 'ace.yaml'
   Boolean debug = opts.containsKey('debug') ? opts.debug : true

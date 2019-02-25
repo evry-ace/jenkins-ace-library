@@ -35,33 +35,33 @@ void call(Map options = [:], Object body) {
 
           // Ace Docker Image Build
           body.dockerBuild = { path = '.', opts = [:] ->
-            path = path ?: '.'
-            opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug]
+            aPath = path ?: '.'
+            //opts = opts ?: [:]
+            //opts << [slack: body.slack, debug: debug]
 
-            body.image = aceBuild(body.ace.helm.image, path, opts)
+            body.image = aceBuild(body.ace.helm.image, aPath)
           }
 
           // Ace Docker Image Push
           body.dockerPush = { envName = '', opts = [:] ->
-            opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug]
+            aOpts = opts ?: [:]
+            aOpts << [slack: body.slack, debug: debug]
 
-            acePush(body.ace, envName, body.image, opts)
+            acePush(body.ace, envName, body.image, aOpts)
           }
 
           // Ace Helm Deploy
           body.deploy = { envName, opts = [:] ->
-            opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug]
+            aOpts = opts ?: [:]
+            aOpts << [slack: body.slack, debug: debug]
 
-            aceDeploy(body.ace, envName, opts)
+            aceDeploy(body.ace, envName, aOpts)
           }
         }
 
         body()
       } catch (err) {
-        if (body.getBinding().hasVariable('slack')) {
+        if (body.slack) {
           body.slack.notifyFailed()
         }
         throw err
