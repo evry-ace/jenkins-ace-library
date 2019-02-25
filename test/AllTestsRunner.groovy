@@ -1,4 +1,5 @@
 import junit.framework.Test
+import junit.framework.TestResult
 import junit.textui.TestRunner
 
 class AllTests {
@@ -13,4 +14,5 @@ class AllTests {
   }
 }
 
-TestRunner.run(AllTests.suite())
+ TestResult result = TestRunner.run(AllTests.suite())
+ System.exit(result.wasSuccessful() ? 0 : 1)
