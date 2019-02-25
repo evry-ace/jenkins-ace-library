@@ -14,5 +14,6 @@ class AllTests {
   }
 }
 
- TestResult result = TestRunner.run(AllTests.suite())
- System.exit(result.wasSuccessful() ? 0 : 1)
+@SuppressWarnings(['SystemExit'])
+TestResult result = TestRunner.run(AllTests.suite())
+System.exit(result.wasSuccessful() ? 0 : 1)
