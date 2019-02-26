@@ -3,18 +3,18 @@
 import no.ace.Slack
 import no.ace.Docker
 
-def call(Map options = [:], body) {
-  def debug = options.containsKey('debug') ? options.debug : true
-  def workspace = options.workspace ?: '/home/jenkins/workspace'
-  def buildAgent = options.buildAgent ?: 'jenkins-docker-3'
-  def dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
-  def aceInit = options.containsKey('aceInit') ? options.aceInit : true
-  def aceFile = options.aceFile ?: 'ace.yaml'
+void call(Map options = [:], Object body) {
+  Boolean debug = options.containsKey('debug') ? options.debug : true
+  String workspace = options.workspace ?: '/home/jenkins/workspace'
+  String buildAgent = options.buildAgent ?: 'jenkins-docker-3'
+  Boolean dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
+  Boolean aceInit = options.containsKey('aceInit') ? options.aceInit : true
+  String aceFile = options.aceFile ?: 'ace.yaml'
 
   node(buildAgent) {
     buildWorkspace([workspace: workspace]) {
       try {
-        println "Dedicated to the original ACE, by Alan Turing"
+        println 'Dedicated to the original ACE, by Alan Turing'
 
         checkout scm
 
@@ -26,8 +26,8 @@ def call(Map options = [:], body) {
           }
 
           if (body.ace?.contact?.slack_notifications) {
-            def channel = body.ace.contact.slack_notifications
-            def alerts = body.ace.contact.slack_alerts ?: channel
+            String channel = body.ace.contact.slack_notifications
+            String alerts = body.ace.contact.slack_alerts ?: channel
 
             body.slack = new Slack(this, channel, alerts)
             body.slack.notifyStarted()
@@ -35,33 +35,33 @@ def call(Map options = [:], body) {
 
           // Ace Docker Image Build
           body.dockerBuild = { path = '.', opts = [:] ->
-            path = path ?: '.'
-            opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug]
+            aPath = path ?: '.'
+            //opts = opts ?: [:]
+            //opts << [slack: body.slack, debug: debug]
 
-            body.image = aceBuild(body.ace.helm.image, path, opts)
+            body.image = aceBuild(body.ace.helm.image, aPath)
           }
 
           // Ace Docker Image Push
           body.dockerPush = { envName = '', opts = [:] ->
-            opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug]
+            aOpts = opts ?: [:]
+            aOpts << [slack: body.slack, debug: debug]
 
-            acePush(body.ace, envName, body.image, opts)
+            acePush(body.ace, envName, body.image, aOpts)
           }
 
           // Ace Helm Deploy
           body.deploy = { envName, opts = [:] ->
-            opts = opts ?: [:]
-            opts << [slack: body.slack, debug: debug]
+            aOpts = opts ?: [:]
+            aOpts << [slack: body.slack, debug: debug]
 
-            aceDeploy(body.ace, envName, opts)
+            aceDeploy(body.ace, envName, aOpts)
           }
         }
 
         body()
       } catch (err) {
-        if (body.getBinding().hasVariable('slack')) {
+        if (body.slack) {
           body.slack.notifyFailed()
         }
         throw err

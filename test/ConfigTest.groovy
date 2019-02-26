@@ -1,13 +1,10 @@
-@Grab('org.yaml:snakeyaml:1.17')
+@Grab('org.yaml:snakeyaml:1.23')
 import org.yaml.snakeyaml.Yaml
 
-import org.junit.Test
 import no.ace.Config
 
-import static groovy.test.GroovyAssert.shouldFail
-
 class ConfigTest extends GroovyTestCase {
-  String fixtures = "test/fixtures"
+  String fixtures = 'test/fixtures'
 
   void testMerge() {
     Map m1 = [a: 1, animals: [cat: 'blue']]
@@ -15,7 +12,7 @@ class ConfigTest extends GroovyTestCase {
 
     assert [:] == Config.merge()
     assert m1 == Config.merge(m1)
-    assert [a:1, b:2, animals:[cat:'blue', dog:'red']] == Config.merge(m1, m2)
+    assert [a: 1, b: 2, animals: [cat: 'blue', dog: 'red']] == Config.merge(m1, m2)
   }
 
   void testClone() {
@@ -34,7 +31,7 @@ class ConfigTest extends GroovyTestCase {
       name: 'foo-bar',
       repo: 'https://evry-ace.github.io/helm-charts',
       repoName: 'ace',
-      values: [:]
+      values: [:],
     ])
   }
 

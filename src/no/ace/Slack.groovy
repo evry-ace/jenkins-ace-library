@@ -1,110 +1,129 @@
 #!/usr/bin/env groovy
-
 package no.ace
 
 // https://jenkins.io/doc/pipeline/steps/slack/
 
 class Slack implements Serializable {
-  def script
-  def channel
-  def alerts
+  Object script
+  String channel
+  String alerts
 
-  Slack(script, channel, alerts = null) {
+  Slack(Object script, String channel, String alerts = null) {
     this.script = script
     this.channel = channel
     this.alerts = alerts
   }
 
-  def getCommitAuthor() {
-    def name = 'Unknown'
+  String commitAuthor() {
+    String name
 
     try {
-      name = script.sh script: "git show -s --pretty=%an", returnStdout: true
-    } catch (e) { }
+      name = script.sh script: 'git show -s --pretty=%an', returnStdout: true
+    } catch (e) {
+      name = 'Unknown'
+    }
 
     return name
   }
 
-  def formatMessage(String buildStatus = 'STARTED', String subject = '') {
-    def buildUrl = script.env.BUILD_URL
+  String formatMessage(String buildStatus = 'STARTED', String buildSubject = '') {
+    String buildUrl = script.env.BUILD_URL
+    String subject
+    String message
 
-    if (subject == '') {
-      def jobName = script.env.JOB_NAME
-      def buildNum = script.env.BUILD_NUMBER
+    if (buildSubject == '') {
+      String jobName = script.env.JOB_NAME
+      String buildNum = script.env.BUILD_NUMBER
 
-      def commitAuthor = getCommitAuthor()
+      String commitAuthor = commitAuthor()
       subject = "${buildStatus}: Job ${jobName} build #${buildNum} by ${commitAuthor}"
     } else {
       subject = "${buildStatus}: ${subject}"
     }
 
     if (buildStatus == 'PENDING INPUT') {
-      return "${subject} <${buildUrl}input/|${buildUrl}input>"
+      message = "${subject} <${buildUrl}input/|${buildUrl}input>"
     } else {
-      return "${subject} <${buildUrl}|${buildUrl}>"
+      message = "${subject} <${buildUrl}|${buildUrl}>"
     }
+
+    return message
   }
 
-  def customMessage(buildStatus, message) {
+  Slack customMessage(String buildStatus, String message) {
     script.slackSend(
       color: 'warning',
       channel: channel,
       notify: false,
       message: formatMessage(buildStatus, message)
     )
+
+    return this
   }
 
-  def notifyStarted() {
+  Slack notifyStarted() {
     script.slackSend(
       color: 'warning',
       channel: channel,
       notify: false,
       message: formatMessage('STARTED')
     )
+
+    return this
   }
 
-  def notifyInput(String message = '') {
+  Slack notifyInput(String message = '') {
     script.slackSend(
       color: 'warning',
       channel: channel,
       notify: true,
       message: formatMessage('PENDING INPUT', message)
     )
+
+    return this
   }
 
-  def notifyDeploy(env) {
+  Slack notifyDeploy(String env) {
     script.slackSend(
       color: 'good',
       channel: channel,
       notify: false,
       message: formatMessage("DEPLOYED TO ${env}")
     )
+
+    return this
   }
 
-  def notifySuccessful() {
+  Slack notifySuccessful() {
     script.slackSend(
       color: 'good',
       channel: channel,
       notify: false,
       message: formatMessage('SUCCESSFUL')
     )
+
+    return this
   }
 
-  def notifyFailed() {
+  Slack notifyFailed() {
     script.slackSend(
       color: 'danger',
       channel: alerts ?: channel,
       notify: true,
       message: formatMessage('FAILED')
     )
+
+    return this
   }
 
-  def notifyAborted() {
+  Slack notifyAborted() {
     script.slackSend(
       color: 'danger',
       channel: channel,
       notify: false,
       message: formatMessage('ABORTED')
     )
+
+    return this
   }
 }

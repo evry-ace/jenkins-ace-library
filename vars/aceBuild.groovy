@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
 
-def call(name, path = '.', opts = [:]) {
+Object call(String name, String path = '.') {
   return docker.build(name, "--pull ${path}")
 }

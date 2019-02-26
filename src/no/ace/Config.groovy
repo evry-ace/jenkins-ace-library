@@ -1,21 +1,20 @@
 #!/usr/bin/env groovy
-
 package no.ace
 
 class Config {
-  static Map parse(Map config, String env = '') {
-    config = this.clone(config)
+  static Map parse(Map c, String env = '') {
+    Map config = this.clone(c)
 
     // Default values for Helm
-    def helmDefaultValues = this.helmDefaultValues(config.name, env)
+    Map helmDefaultValues = this.helmDefaultValues(config.name, env)
 
     // Common values for Helm
-    def helmCommonValues = config.helm ?: [:]
+    Map helmCommonValues = config.helm ?: [:]
     config.remove('helm')
 
     // Deployment environment specific values for Helm
     config.environments = config.environments ?: [:]
-    def helmDeployValues = config.environments[env] ?: [:]
+    Map helmDeployValues = config.environments[env] ?: [:]
     config.remove('environments')
 
     // Merge Helm values
@@ -31,20 +30,18 @@ class Config {
       name: "${name}-${env}",
       repo: 'https://evry-ace.github.io/helm-charts',
       repoName: 'ace',
-      values: [
-        name: "${name}"
-      ]
+      values: [:],
     ]
   }
 
   static Map clone(Map orig) {
-    def bos = new ByteArrayOutputStream()
-    def oos = new ObjectOutputStream(bos)
+    ByteArrayOutputStream bos = new ByteArrayOutputStream()
+    ObjectOutputStream oos = new ObjectOutputStream(bos)
 
     oos.writeObject(orig); oos.flush()
 
-    def bin = new ByteArrayInputStream(bos.toByteArray())
-    def ois = new ObjectInputStream(bin)
+    ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray())
+    ObjectInputStream ois = new ObjectInputStream(bin)
 
     return ois.readObject()
   }

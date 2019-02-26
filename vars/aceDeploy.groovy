@@ -2,30 +2,31 @@
 
 import no.ace.Config
 
-def call(config, envName, opts = [:]) {
-  def acefile = opts.acefile ?: 'ace.yaml'
-  def debug = opts.containsKey('debug') ? opts.debug : true
-  def dryrun = opts.dryrun ?: false
-  def wait = opts.containsKey('wait') ? opts.wait : true
-  def timeout = opts.timeout ?: 600
-  def dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
+@SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
+void call(Map config, String envName, Map opts = [:]) {
+  // String  acefile = opts.acefile ?: 'ace.yaml'
+  Boolean debug = opts.containsKey('debug') ? opts.debug : true
+  Boolean dryrun = opts.dryrun ?: false
+  Boolean wait = opts.containsKey('wait') ? opts.wait : true
+  Integer timeout = opts.timeout ?: 600
+  Boolean dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
 
-  def kubectlImage = opts.kubectlImage ?: 'lachlanevenson/k8s-kubectl'
-  def kubectlVersion = opts.kubectlVersion ?: 'v1.6.0'
-  def kubectlOpts = opts.kubectlOpts ?: "--entrypoint=''"
+  String kubectlImage = opts.kubectlImage ?: 'lachlanevenson/k8s-kubectl'
+  String kubectlVersion = opts.kubectlVersion ?: 'v1.6.0'
+  String kubectlOpts = opts.kubectlOpts ?: "--entrypoint=''"
 
-  def helmImage = opts.helmImage ?: 'lachlanevenson/k8s-helm'
-  def helmVersion = opts.helmVersion ?: 'v2.6.0'
-  def helmOpts = opts.helmOpts ?: "--entrypoint=''"
-  def helmValuesFile = '.ace/values.yaml'
+  String helmImage = opts.helmImage ?: 'lachlanevenson/k8s-helm'
+  String helmVersion = opts.helmVersion ?: 'v2.6.0'
+  String helmOpts = opts.helmOpts ?: "--entrypoint=''"
+  String helmValuesFile = '.ace/values.yaml'
 
-  def (org, repo, branch) = env.JOB_NAME.split('/')
+  def (String org, String repo, String branch) = env.JOB_NAME.split('/')
   println "org=${org}, repo=${repo}, branch=${branch}"
 
   // @TODO this logic could be moved to the Config Class
   config.name = config.name ?: repo
 
-  def ace = Config.parse(config, envName)
+  Map ace = Config.parse(config, envName)
   ace.helm = ace.helm ?: [:]
   ace.helm.values = ace.helm.values ?: [:]
 
@@ -33,7 +34,7 @@ def call(config, envName, opts = [:]) {
     ace.helm.values.image = ace.helm.values.image ?: [:]
 
     if (ace.helm.image) {
-      def (repository, tag) = ace.helm.image.split(':')
+      def (String repository, String tag) = ace.helm.image.split(':')
       ace.helm.values.image.repository = repository
       ace.helm.values.image.tag = tag
     }
@@ -41,7 +42,7 @@ def call(config, envName, opts = [:]) {
     if (ace.helm.registry) {
       ace.helm.values.image.repository = [
         ace.helm.registry,
-        ace.helm.values.image.repository
+        ace.helm.values.image.repository,
       ].join('/')
 
       ace.helm.values.image.pullSecrets = ace.helm.values.image.pullSecrets ?: []
@@ -49,19 +50,19 @@ def call(config, envName, opts = [:]) {
     }
   }
 
-  def helmName = ace.helm.name
-  def helmNamespace = ace.helm.namespace
-  def helmRepo = ace.helm.repo
-  def helmRepoName = ace.helm.repoName
-  def helmChart = ace.helm.chart
-  def helmChartVersion = ace.helm.version
+  String helmName = ace.helm.name
+  String helmNamespace = ace.helm.namespace
+  String helmRepo = ace.helm.repo
+  String helmRepoName = ace.helm.repoName
+  String helmChart = ace.helm.chart
+  String helmChartVersion = ace.helm.version
 
   println ace.helm.values
   println "Writing ace.helm.values to ${helmValuesFile}..."
   writeYaml file: helmValuesFile, data: ace.helm.values
 
-  def credId  = ace.helm.cluster
-  def credVar = 'KUBECONFIG'
+  String credId  = ace.helm.cluster
+  String credVar = 'KUBECONFIG'
 
   withCredentials([file(credentialsId: credId, variable: credVar)]) {
     // Get Helm Version
@@ -98,7 +99,7 @@ def call(config, envName, opts = [:]) {
       // where a failed first deploy (release) will prevent any further release
       // for the same release name. We have solved this by purging the failed
       // release if we detect a failure.
-      def helmExists = sh(script: "helm history ${helmName}", returnStatus: true) == 0
+      Boolean helmExists = sh(script: "helm history ${helmName}", returnStatus: true) == 0
 
       try {
         sh """
@@ -127,7 +128,10 @@ def call(config, envName, opts = [:]) {
         if (!helmExists && !dryrun) {
           try {
             sh(script: "helm delete ${helmName} --purge", returnStatus: true)
-          } catch (e) {}
+          } catch (e) {
+            println 'Helm purge failed'
+            println e
+          }
         }
 
         throw err
