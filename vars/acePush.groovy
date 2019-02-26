@@ -2,7 +2,7 @@
 
 import no.ace.Config
 
-void call(Map config, Map env, Object image, Map opts = [:]) {
+void call(Map config, String env, Object image, Map opts = [:]) {
   Boolean dryrun = opts.dryrun ?: false
 
   Map ace = Config.parse(config, env)
