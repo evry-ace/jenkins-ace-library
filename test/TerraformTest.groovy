@@ -17,6 +17,24 @@ class TerraformTest extends GroovyTestCase {
     ]
   }
 
+  void testCredsEnvify() {
+    List credsIn = [
+      [id: 'foo_cred'],
+      [id: 'foobar_cred', env: 'TF_VAR_foobar_cred'],
+      [id: 'bar_cred'],
+      [id: 'barfoo_cred', env: 'TF_VAR_barfoo_cred'],
+    ]
+
+    List credsOut = [
+      [credentialsId: 'test_foo_cred', variable: 'TF_VAR_foo_cred'],
+      [credentialsId: 'test_foobar_cred', variable: 'TF_VAR_foobar_cred'],
+      [credentialsId: 'test_bar_cred', variable: 'TF_VAR_bar_cred'],
+      [credentialsId: 'test_barfoo_cred', variable: 'TF_VAR_barfoo_cred'],
+    ]
+
+    assert Terraform.credsEnvify('test', credsIn) == credsOut
+  }
+
   void testVarFiles() {
     assert Terraform.varFiles('../env', 'common.tfvars', []) == [
       '-var-file=../env/common.tfvars',

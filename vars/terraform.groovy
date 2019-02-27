@@ -73,7 +73,7 @@ Object call(String env, Map opts = [:], Object body) {
         }
       }
 
-      envCredentials(env, applyCreds + extraCreds) {
+      envCredentials(env, applyCreds + extraCreds, [prefix: 'TF_VAR_']) {
         body()
       }
     }

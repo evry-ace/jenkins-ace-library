@@ -2,6 +2,7 @@
 package no.ace
 
 class Terraform {
+  static String credsPrefix = 'TF_VAR_'
   static Map creds = [
     azure: [
       state: [
@@ -23,6 +24,19 @@ class Terraform {
 
   static List stateCreds(String provider) {
     return this.creds[provider].state
+  }
+
+  static List credsEnvify(String env, List creds) {
+    List result = []
+
+    creds.eachWithIndex { cred, i ->
+      result.add([
+        credentialsId: "${env}_${cred.id}",
+        variable: cred.env ? cred.env : "${this.credsPrefix}${cred.id}",
+      ])
+    }
+
+    return result
   }
 
   static String varFiles(String dir, String varfile, List extraVarfiles = []) {
