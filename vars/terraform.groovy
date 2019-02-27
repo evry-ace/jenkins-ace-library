@@ -21,17 +21,17 @@ Object call(String path, String env, Map opts = [:], Object body) {
     [id: 'azure_client_id', env: 'TF_VAR_client_id'],
     [id: 'azure_client_secret', env: 'TF_VAR_client_secret'],
     [id: 'azure_tenant_id', env: 'TF_VAR_tenant_id'],
-    [id: 'aks_rbac_client_app_id', env: 'TF_VAR_aks_rbac_client_app_id'],
-    [id: 'aks_rbac_server_app_id', env: 'TF_VAR_aks_rbac_server_app_id'],
-    [id: 'aks_rbac_server_app_secret', env: 'TF_VAR_aks_rbac_server_app_secret'],
-    [id: 'azure_storage_account_name', env: 'TF_VAR_storage_account_name'],
-    [id: 'azure_storage_access_key', env: 'TF_VAR_storage_account_key'],
   ]
 
   // extra terraform credentials
   // @TODO remove default
   List extraCreds = opts.extraCreds ?: [
     [id: 'db_password', env: 'TF_VAR_db_password'],
+    [id: 'aks_rbac_client_app_id'],
+    [id: 'aks_rbac_server_app_id'],
+    [id: 'aks_rbac_server_app_secret'],
+    [id: 'azure_storage_account_name'],
+    [id: 'azure_storage_access_key', env: 'TF_VAR_storage_account_key'],
   ]
 
   // helper functions used inside terraform dsl
@@ -72,7 +72,7 @@ Object call(String path, String env, Map opts = [:], Object body) {
   docker.image(dockerImage).inside(dockerArgs) {
     dir(tf.path) {
       if (init) {
-        envCredentials(env, stateCreds) {
+        envCredentials(env, stateCreds, [prefix: 'TF_VAR_']) {
           get()
           init()
           workspace()
