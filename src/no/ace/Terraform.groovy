@@ -17,21 +17,22 @@ class Terraform {
     ]
   ]
 
-  static Map applyCreds(String provider) {
+  static List applyCreds(String provider) {
     return this.creds[provider].apply
   }
 
-  static Map stateCreds(String provider) {
-    return this.creds[provider].apply
+  static List stateCreds(String provider) {
+    return this.creds[provider].state
   }
 
-  static String varFiles(String dir, String varfile, List extraVarfiles) {
-    List files = []
+  static String varFiles(String dir, String varfile, List extraVarfiles = []) {
+    List rawfiles = [varfile] + extraVarfiles
+    List outfiles = []
 
-    [varfile].pluss(extraVarfiles).eachWithIndex { file, i ->
-      files.add("-var-file=${dir}/${file}")
+    rawfiles.eachWithIndex { file, i ->
+      outfiles.add("-var-file=${dir}/${file}")
     }
 
-    return file.join(' ')
+    return outfiles.join(' ')
   }
 }

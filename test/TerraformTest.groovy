@@ -1,37 +1,30 @@
 import no.ace.Terraform
 
 class TerraformTest extends GroovyTestCase {
-  void testConstructor() {
-    new Terraform('.', [:])
+  void testAzureApplyCreds() {
+    assert Terraform.applyCreds('azure') == [
+      [id: 'azure_subscription_id', env: 'TF_VAR_subscription_id'],
+      [id: 'azure_client_id', env: 'TF_VAR_client_id'],
+      [id: 'azure_client_secret', env: 'TF_VAR_client_secret'],
+      [id: 'azure_tenant_id', env: 'TF_VAR_tenant_id'],
+    ]
   }
 
-  void testVarFilesLint() {
-    List<String> varFiles = ['1.tfvars', '2.tfvars']
-    Terraform tf = new Terraform('.', [varFiles: varFiles])
-
-    String files = tf.varFilesTfLint()
-    assert files == '1.tfvars,2.tfvars'
+  void testAzureStateCreds() {
+    assert Terraform.stateCreds('azure') == [
+      [id: 'azure_storage_account_name', env: 'AZURE_STORAGE_ACCOUNT'],
+      [id: 'azure_storage_access_key', env: 'AZURE_STORAGE_KEY'],
+    ]
   }
 
   void testVarFiles() {
-    List<String> varFiles = ['1.tfvars', '2.tfvars']
-    Terraform tf = new Terraform('.', [varFiles: varFiles])
+    assert Terraform.varFiles('../env', 'common.tfvars', []) == [
+      '-var-file=../env/common.tfvars',
+    ].join(' ')
 
-    String files = tf.varFilesTf()
-    assert files == '--var-file=1.tfvars --var-file=2.tfvars'
-  }
-
-  void testMakeArgs() {
-    Terraform tf = new Terraform('.', [args: ['-e FOO=1']])
-
-    String args = tf.makeDockerArgs()
-    assert args == '--entrypoint=\'\' -e FOO=1'
-  }
-
-  void testMakeArgsWithExtra() {
-    Terraform tf = new Terraform('.', [args: ['-e FOO=1']])
-
-    String args = tf.makeDockerArgs(['-e BAR=1'])
-    assert args == '--entrypoint=\'\' -e FOO=1 -e BAR=1'
+    assert Terraform.varFiles('env', 'test.tfvars', ['common.tfvars']) == [
+      '-var-file=env/test.tfvars',
+      '-var-file=env/common.tfvars',
+    ].join(' ')
   }
 }
