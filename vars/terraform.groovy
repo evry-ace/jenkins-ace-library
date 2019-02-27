@@ -1,62 +1,56 @@
+#!/usr/bin/env groovy
+
 import no.ace.Terraform
 
-Object call(String path, String env, Map opts = [:], Object body) {
+@SuppressWarnings(['UnnecessaryObjectReferences'])
+Object call(String env, Map opts = [:], Object body) {
   Boolean init = opts.containsKey('init') ? opts.init : true
   String provider = opts.provider ?: 'azure'
+
+  String path = opts.path ?: '.'
   String planFile = opts.planFile ?: "${env}-plan"
-  String dockerImage = 'hashicorp/terraform:light'
+
+  String varfilesDir = opts.varfilesDir ?: 'env'
+  String varfilesDefault = opts.varfilesDefault ?: "${env}.tfvars"
+  List varfilesExtra = opts.varfilesExtra ?: []
+  String varfiles = Terraform.varfiles(varfilesDir, varfilesDefault, varfilesExtra)
+
+  String dockerImage = opts.dockerImage ?: 'hashicorp/terraform:light'
   String dockerArgs = ["--entrypoint=''", "-e HELM_HOME=${env.WORKSPACE}"].join(' ')
 
   // terraform state credentials
-  // @TODO move to default azure creds
-  List stateCreds = opts.stateCreds ?: [
-    [id: 'azure_storage_account_name', env: 'AZURE_STORAGE_ACCOUNT'],
-    [id: 'azure_storage_access_key', env: 'AZURE_STORAGE_KEY'],
-  ]
+  List stateCreds = opts.stateCreds ?: Terraform.stateCreds(provider)
 
   // terraform apply credentials
-  // @TODO move to default
-  List applyCreds = opts.applyCreds ?: [
-    [id: 'azure_subscription_id', env: 'TF_VAR_subscription_id'],
-    [id: 'azure_client_id', env: 'TF_VAR_client_id'],
-    [id: 'azure_client_secret', env: 'TF_VAR_client_secret'],
-    [id: 'azure_tenant_id', env: 'TF_VAR_tenant_id'],
-  ]
+  List applyCreds = opts.applyCreds ?: Terraform.applyCreds(provider)
 
   // extra terraform credentials
-  // @TODO remove default
-  List extraCreds = opts.extraCreds ?: [
-    [id: 'db_password', env: 'TF_VAR_db_password'],
-    [id: 'aks_rbac_client_app_id'],
-    [id: 'aks_rbac_server_app_id'],
-    [id: 'aks_rbac_server_app_secret'],
-    [id: 'azure_storage_account_name'],
-    [id: 'azure_storage_access_key', env: 'TF_VAR_storage_account_key'],
-  ]
+  List extraCreds = opts.extraCreds ?: []
 
   // helper functions used inside terraform dsl
   body.get = { ->
-    sh """
-    terraform get
-    """
+    sh 'terraform get'
   }
 
   body.init = { ->
-    sh """
-    terraform init -no-color ${tf.makeTfArgs()}
-    """
+    sh "terraform init -no-color ${varfiles}"
+  }
+
+  body.lint = { ->
+    sh 'terraform fmt -check=true'
   }
 
   body.plan = { ->
-    sh """
-    terraform plan -no-color -out=${outPath} ${tf.varFilesTf()}
-    """
+    sh "terraform plan -no-color -out=${planFile} ${varfiles}"
+  }
+
+  body.show = { ->
+    String script = "terraform plan -no-color ${planFile}"
+    return sh(returnStdout: true, script: script)
   }
 
   body.apply = { ->
-    sh """
-    terraform apply -no-color -auto-approve ${tf.varFilesTf()} ${tf.applyPath(name)}
-    """
+    sh "terraform apply -no-color -auto-approve ${varfiles} ${planFile}"
   }
 
   body.workspace = { ->
@@ -70,7 +64,7 @@ Object call(String path, String env, Map opts = [:], Object body) {
   }
 
   docker.image(dockerImage).inside(dockerArgs) {
-    dir(tf.path) {
+    dir(path) {
       if (init) {
         envCredentials(env, stateCreds, [prefix: 'TF_VAR_']) {
           get()
