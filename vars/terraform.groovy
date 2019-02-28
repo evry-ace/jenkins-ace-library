@@ -50,7 +50,7 @@ Object call(String env, Map opts = [:], Object body) {
   }
 
   body.apply = { ->
-    sh "terraform apply -no-color -auto-approve ${varfiles} ${planFile}"
+    sh "terraform apply -no-color -auto-approve ${planFile}"
   }
 
   body.workspace = { ->
