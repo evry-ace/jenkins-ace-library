@@ -3,20 +3,23 @@
 import no.ace.Terraform
 
 @SuppressWarnings(['UnnecessaryObjectReferences'])
-Object call(String env, Map opts = [:], Object body) {
+Object call(String environment, Map opts = [:], Object body) {
   Boolean init = opts.containsKey('init') ? opts.init : true
   String provider = opts.provider ?: 'azure'
 
   String path = opts.path ?: '.'
-  String planFile = opts.planFile ?: "${env}-plan"
+  String planFile = opts.planFile ?: "${environment}-plan"
 
   String varfilesDir = opts.varfilesDir ?: 'env'
-  String varfilesDefault = opts.varfilesDefault ?: "${env}.tfvars"
+  String varfilesDefault = opts.varfilesDefault ?: "${environment}.tfvars"
   List varfilesExtra = opts.varfilesExtra ?: []
   String varfiles = Terraform.varfiles(varfilesDir, varfilesDefault, varfilesExtra)
 
   String dockerImage = opts.dockerImage ?: 'hashicorp/terraform:light'
   String dockerArgs = ["--entrypoint=''", "-e HELM_HOME=${env.WORKSPACE}"].join(' ')
+
+  String workspace = opts.workspace ?: environment
+  String credsPrefix = opts.credsPrefix ?: environment
 
   // terraform state credentials
   List stateCreds = opts.stateCreds ?: Terraform.stateCreds(provider)
@@ -27,13 +30,15 @@ Object call(String env, Map opts = [:], Object body) {
   // extra terraform credentials
   List extraCreds = opts.extraCreds ?: []
 
+  String backendConfig = Terraform.backendConfig(stateCreds)
+
   // helper functions used inside terraform dsl
   body.get = { ->
     sh 'terraform get'
   }
 
   body.init = { ->
-    sh "terraform init -no-color ${varfiles}"
+    sh "terraform init -no-color ${backendConfig}"
   }
 
   body.lint = { ->
@@ -55,10 +60,10 @@ Object call(String env, Map opts = [:], Object body) {
 
   body.workspace = { ->
     sh """
-    [ -z `terraform workspace list | grep -w ${workspaceName}` ] && {
-      terraform workspace new ${workspaceName}
+    [ -z `terraform workspace list | grep -w ${workspace}` ] && {
+      terraform workspace new ${workspace}
     } || {
-      terraform workspace select ${workspaceName}
+      terraform workspace select ${workspace}
     }
     """
   }
@@ -66,14 +71,15 @@ Object call(String env, Map opts = [:], Object body) {
   docker.image(dockerImage).inside(dockerArgs) {
     dir(path) {
       if (init) {
-        envCredentials(env, stateCreds, [prefix: 'TF_VAR_']) {
-          get()
-          init()
-          workspace()
+        envCredentials(credsPrefix, stateCreds, [prefix: 'TF_VAR_']) {
+          body.get()
+          body.init()
+          body.workspace()
         }
       }
 
-      envCredentials(env, applyCreds + extraCreds, [prefix: 'TF_VAR_']) {
+      List creds = applyCreds + stateCreds + extraCreds
+      envCredentials(credsPrefix, creds, [prefix: 'TF_VAR_']) {
         body()
       }
     }

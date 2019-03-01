@@ -11,10 +11,24 @@ class TerraformTest extends GroovyTestCase {
   }
 
   void testAzureStateCreds() {
-    assert Terraform.stateCreds('azure') == [
-      [id: 'azure_storage_account_name', env: 'AZURE_STORAGE_ACCOUNT'],
-      [id: 'azure_storage_access_key', env: 'AZURE_STORAGE_KEY'],
-    ]
+    assert Terraform.stateCreds('azure') == [[
+      id: 'azure_storage_account_name',
+      backendConfig: 'storage_account_name',
+      env: 'AZURE_STORAGE_ACCOUNT',
+    ], [
+      id: 'azure_storage_access_key',
+      backendConfig: 'access_key',
+      env: 'AZURE_STORAGE_KEY',
+    ], ]
+  }
+
+  void testBackendConfig() {
+    String config = [
+      '-backend-config="storage_account_name=$AZURE_STORAGE_ACCOUNT"',
+      '-backend-config="access_key=$AZURE_STORAGE_KEY"',
+    ].join(' ')
+
+    assert Terraform.backendConfig(Terraform.stateCreds('azure')) == config
   }
 
   void testCredsEnvify() {
