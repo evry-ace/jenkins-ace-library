@@ -5,10 +5,15 @@ class Terraform {
   static String credsPrefix = 'TF_VAR_'
   static Map creds = [
     azure: [
-      state: [
-        [id: 'azure_storage_account_name', env: 'AZURE_STORAGE_ACCOUNT'],
-        [id: 'azure_storage_access_key', env: 'AZURE_STORAGE_KEY'],
-      ],
+      state: [[
+        id: 'azure_storage_account_name',
+        backendConfig: 'storage_account_name',
+        env: 'AZURE_STORAGE_ACCOUNT',
+      ], [
+        id: 'azure_storage_access_key',
+        backendConfig: 'access_key',
+        env: 'AZURE_STORAGE_KEY',
+      ]],
       apply: [
         [id: 'azure_subscription_id', env: 'TF_VAR_subscription_id'],
         [id: 'azure_client_id', env: 'TF_VAR_client_id'],
@@ -24,6 +29,16 @@ class Terraform {
 
   static List stateCreds(String provider) {
     return this.creds[provider].state
+  }
+
+  static String backendConfig(List creds) {
+    List result = []
+
+    creds.eachWithIndex { cred, i ->
+      result.add("-backend-config=\"${cred.backendConfig}=\$${cred.env}\"")
+    }
+
+    return result.join(' ')
   }
 
   static List credsEnvify(String env, List creds) {
