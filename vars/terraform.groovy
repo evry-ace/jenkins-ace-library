@@ -13,7 +13,7 @@ Object call(String environment, Map opts = [:], Object body) {
   String varfilesDir = opts.varfilesDir ?: 'env'
   String varfilesDefault = opts.varfilesDefault ?: "${environment}.tfvars"
   List varfilesExtra = opts.varfilesExtra ?: []
-  String varfiles = Terraform.varfiles(varfilesDir, varfilesDefault, varfilesExtra)
+  String varfiles = Terraform.varFiles(varfilesDir, varfilesDefault, varfilesExtra)
 
   String dockerImage = opts.dockerImage ?: 'hashicorp/terraform:light'
   String dockerArgs = ["--entrypoint=''", "-e HELM_HOME=${env.WORKSPACE}"].join(' ')
