@@ -22,6 +22,7 @@ void call(Map options = [:], Object body) {
           body.ace = readYaml file: aceFile
 
           if (dockerSet) {
+            body.ace.helm = body.ace.helm ?: [:]
             body.ace.helm.image = new Docker(this).image()
           }
 
