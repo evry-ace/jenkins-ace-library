@@ -61,7 +61,7 @@ void call(Map options = [:], Object body) {
 
         body()
       } catch (err) {
-        if (body.slack) {
+        if (body.hasProperty('slack') && body.slack) {
           body.slack.notifyFailed()
         }
         throw err
