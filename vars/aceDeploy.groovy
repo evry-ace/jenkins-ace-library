@@ -59,6 +59,12 @@ void call(Map config, String envName, Map opts = [:]) {
 
   println ace.helm.values
   println "Writing ace.helm.values to ${helmValuesFile}..."
+
+  File file = new File(helmValuesFile)
+  if (file.exists()) {
+    sh "rm ${helmValuesFile}"
+  }
+
   writeYaml file: helmValuesFile, data: ace.helm.values
 
   String credId  = ace.helm.cluster
