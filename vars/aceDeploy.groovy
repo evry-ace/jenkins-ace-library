@@ -60,7 +60,10 @@ void call(Map config, String envName, Map opts = [:]) {
   println ace.helm.values
   println "Writing ace.helm.values to ${helmValuesFile}..."
 
-  sh "[ -f ${helmValuesFile} ] && rm ${helmValuesFile}"
+  Boolean valuesFileExists = fileExists(helmValuesFile)
+  if (valuesFileExists) {
+    sh "rm ${helmValuesFile}"
+  }
 
   writeYaml file: helmValuesFile, data: ace.helm.values
 
