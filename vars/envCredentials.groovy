@@ -2,6 +2,8 @@
 
 void call(String env, List creds, Map opts, Object body) {
   String prefix = opts.prefix ?: ''
+  String credsProvider = opts.credsProvider ?: 'jenkins'
+
   List credentials = []
 
   creds.eachWithIndex { cred, index ->
@@ -10,7 +12,13 @@ void call(String env, List creds, Map opts, Object body) {
     credentials.add(string(credentialsId: id, variable: var))
   }
 
-  withCredentials(credentials) {
-    body()
+  if (credsProvider == 'azureKeyvault') {
+    withAzureKeyvault(credentials) {
+      body()
+    }
+  } else if (credsProvider == 'jenkins') {
+    withCredentials(credentials) {
+      body()
+    }
   }
 }
