@@ -10,7 +10,13 @@ void call(String env, List creds, Map opts, Object body) {
     credentials.add(string(credentialsId: id, variable: var))
   }
 
-  withCredentials(credentials) {
-    body()
+  if (opts.credsProvider == "azureKeyvault") {
+    withAzureKeyvault(credentials) {
+      body()
+    }
+  } else if (opts.credsProvider == "jenkins") {
+    withCredentials(credentials) {
+      body()
+    }
   }
 }

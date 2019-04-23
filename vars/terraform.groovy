@@ -7,6 +7,8 @@ Object call(String environment, Map opts = [:], Object body) {
   Boolean init = opts.containsKey('init') ? opts.init : true
   String provider = opts.provider ?: 'azure'
 
+  String credsProvider = opts.credsProvider ?: 'jenkins'
+
   String path = opts.path ?: '.'
   String planFile = opts.planFile ?: "${environment}-plan"
 
@@ -71,7 +73,7 @@ Object call(String environment, Map opts = [:], Object body) {
   docker.image(dockerImage).inside(dockerArgs) {
     dir(path) {
       if (init) {
-        envCredentials(credsPrefix, stateCreds, [prefix: 'TF_VAR_']) {
+        envCredentials(credsPrefix, stateCreds, [prefix: 'TF_VAR_', credsProvider: credsProvider]) {
           body.get()
           body.init()
           body.workspace()
@@ -79,7 +81,7 @@ Object call(String environment, Map opts = [:], Object body) {
       }
 
       List creds = applyCreds + stateCreds + extraCreds
-      envCredentials(credsPrefix, creds, [prefix: 'TF_VAR_']) {
+      envCredentials(credsPrefix, creds, [prefix: 'TF_VAR_', credsProvider: credsProvider]) {
         body()
       }
     }
