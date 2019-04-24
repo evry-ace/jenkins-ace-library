@@ -1,7 +1,3 @@
-/**
- * getCommitHash returns the current git commit hash.
- */
-def call(Map opts = [:]) {
-	// echo "opts: $opts"
-	sh "git rev-parse HEAD"
+String getCommitHash() {
+  return sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
 }

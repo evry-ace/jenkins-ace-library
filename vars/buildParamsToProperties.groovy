@@ -7,8 +7,8 @@ String call(Map params, List<Map> artifacts) {
   List<String> data = mapToList(params)
 
   artifacts.each { artifact ->
-    if (artifact.name.contains("/values/")) {
-      String key = artifact.name.split("/").last().replace(".yaml", "")
+    if (artifact.name.contains('/values/')) {
+      String key = artifact.name.split('/').last().replace('.yaml', '')
 
       data.push("values_${key}=${artifact.reference}")
     }

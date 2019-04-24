@@ -1,21 +1,21 @@
+#!/usr/bin/env groovy
+
 /* Utility helper for s3Cmd when other plugins doesnt work */
 
+@SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
 void call(String s3Command, Map opts = [:]) {
-  String secretKey = env.AWS_SECRET_ACCESS_KKEY != '' ? env.AWS_SECRET_ACCESS_KKEY : opts.awsSecretKey
-  String accessKey = env.AWS_ACCESS_KEY_ID != '' ? env.AWS_ACCESS_KEY_ID : opts.awsAccessKeyId
+  String secretKey = env.AWS_SECRET_ACCESS_KKEY ?: opts.awsSecretKey
+  String accessKey = env.AWS_ACCESS_KEY_ID ?: opts.awsAccessKeyId
 
   List<String> runArgs = [
     "-e AWS_ACCESS_KEY_ID=${accessKey}",
     "-e AWS_SECRET_ACCESS_KEY=${secretKey}",
-    "-v $PWD:/data -w /data"
+    "-v $PWD:/data -w /data",
   ]
 
   List<String> shellCommand = [
-    "s3cmd",
+    's3cmd',
   ]
-
-  String payload = groovy.json.JsonOutput.toJson(opts)
-  echo payload
 
   if (opts.host) {
     shellCommand.push("--host ${opts.host}")
@@ -27,10 +27,9 @@ void call(String s3Command, Map opts = [:]) {
     shellCommand.push(opts.cmdOpts)
   }
 
-  String cmd = shellCommand.join((" ")
-  echo cmd
+  String cmd = shellCommand.join(' ')
 
-  docker.image("gerland/docker-s3cmd").inside(runArgs.join(" ")) {
-    sh "${cmd}"
+  docker.image('gerland/docker-s3cmd').inside(runArgs.join(' ')) {
+    sh(script: cmd)
   }
 }

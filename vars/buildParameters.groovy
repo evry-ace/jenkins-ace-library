@@ -1,4 +1,5 @@
-import no.evry.Spinnaker
+import no.evry.Docker
+import no.evry.Git
 
 /*
   Function to make parameters about the build
@@ -15,18 +16,20 @@ import no.evry.Spinnaker
 */
 
 Map<String, Object> call(Object script, Map parameters = [:], Map opts = [:]) {
-  Docker docker = new Docker(script, opts)
+  Docker dockerUtil = new Docker(script, opts)
   Git git = new Git()
 
-  parameters.img_fqn = docker.image(opts.registry != null ? opts.registry : '')
-  parameters.img_name = docker.imageName()
-  parameters.img_tag = docker.buildTag()
+  parameters << [
+    img_fqn: dockerUtil.image(opts.registry != null ? opts.registry : ''),
+    img_name: dockerUtil.imageName(),
+    img_tag: dockerUtil.buildTag(),
 
-  parameters.git_pr_id = git.prId(env)
-  parameters.git_pr_url = git.prUrl(env)
-  parameters.git_release = git.releaseBranchVersion(env)
-  parameters.git_commit_short = git.gitShortCommit(script)
-  parameters.git_commit = git.gitCommit(script)
+    git_pr_id: git.prId(env),
+    git_pr_url: git.prUrl(env),
+    git_release: git.releaseBranchVersion(env),
+    git_commit_short: git.gitShortCommit(script),
+    git_commit: git.gitCommit(script),
+  ]
 
   return parameters
 }
