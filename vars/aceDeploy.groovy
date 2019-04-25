@@ -12,11 +12,11 @@ void call(Map config, String envName, Map opts = [:]) {
   Boolean dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
 
   String kubectlImage = opts.kubectlImage ?: 'lachlanevenson/k8s-kubectl'
-  String kubectlVersion = opts.kubectlVersion ?: 'v1.6.0'
+  String kubectlVersion = opts.kubectlVersion ?: 'v1.12.7'
   String kubectlOpts = opts.kubectlOpts ?: "--entrypoint=''"
 
   String helmImage = opts.helmImage ?: 'lachlanevenson/k8s-helm'
-  String helmVersion = opts.helmVersion ?: 'v2.6.0'
+  String helmVersion = opts.helmVersion ?: 'v2.13.1'
   String helmOpts = opts.helmOpts ?: "--entrypoint=''"
   String helmValuesFile = '.ace/values.yaml'
 
