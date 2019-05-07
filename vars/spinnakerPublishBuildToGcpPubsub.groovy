@@ -11,6 +11,7 @@
 void call(Map opts = [:]) {
   String secret = opts.secret ?: 'gcp-jenkins-pubsub'
   String topic = opts.topic ?: 'build_done'
+  String infoFile = opts.infoFile ?: 'build.json'
 
   List<String> dockerOpts = [
     "-e GCP_KEY=${env.GCP_KEY}",
@@ -32,7 +33,7 @@ void call(Map opts = [:]) {
       echo $GCP_KEY | base64 -d > /tmp/google-key.json
       gcloud auth activate-service-account --key-file=/tmp/google-key.json \
         --project ${opts.project}
-      gcloud pubsub topics publish ${topic} --message "`cat build.json`"
+      gcloud pubsub topics publish ${topic} --message "`cat ${infoFile}`"
       """
     }
   }
