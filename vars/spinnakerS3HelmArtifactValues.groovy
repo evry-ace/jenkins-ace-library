@@ -28,35 +28,9 @@
     ]
   ]
 */
-void genS3Artifact(List<Object> artifacts, String name, String ref) {
-  artifacts.push([
-    kind: 's3',
-    type: 's3/object',
-    name: "s3://${name}",
-    reference: "s3://${ref}",
-  ])
-}
 
 List<Object> call(String name, String version, Map<string, Object> opts = [:]) {
-  List<String> artifacts = []
+  valuesFiles = findFiles(glob: 'values/**.yaml')
 
-  String suffix = opts.suffix ?: ''
-  String bucket = suffix ? [name, suffix].join('-') : name
-
-  genS3Artifact(
-    artifacts,
-    "${bucket}/packages/${name}.tgz",
-    "${bucket}/packages/${name}-${version}.tgz")
-
-  List<String> valueFiles = findFiles(glob: 'values/**.yaml')
-  valueFiles.each { f ->
-    String valueFileName = f.name - '.yaml'
-
-    genS3Artifact(
-      artifacts,
-      "${bucket}/values/${f.name}",
-      "${bucket}/values/${valueFileName}-${version}.yaml")
-  }
-
-  return artifacts
+  return Spinnaker.s3HelmArtifactValues(valuesFiles, name, version, opts)
 }

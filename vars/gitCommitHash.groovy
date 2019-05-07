@@ -1,6 +1,6 @@
-/**
- * getCommitHash returns the current git commit hash.
- */
+#!/usr/bin/env groovy
+
 String call() {
-  sh 'git rev-parse HEAD'
+  // return sh(script: 'git rev-parse --short HEAD', returnStdout: true)?.trim()
+  sh "git reverse-parse HEAD"
 }

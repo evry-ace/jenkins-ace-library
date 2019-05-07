@@ -11,6 +11,7 @@ class AllTests {
     allTests.addTestSuite(SlackTest)
     allTests.addTestSuite(DockerTest)
     allTests.addTestSuite(TerraformTest)
+    allTests.addTestSuite(SpinnakerTest)
 
     return allTests
   }

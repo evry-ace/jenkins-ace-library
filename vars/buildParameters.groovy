@@ -27,8 +27,8 @@ Map<String, Object> call(Object script, Map parameters = [:], Map opts = [:]) {
     git_pr_id: git.prId(env),
     git_pr_url: git.prUrl(env),
     git_release: git.releaseBranchVersion(env),
-    git_commit_short: git.gitShortCommit(script),
-    git_commit: git.gitCommit(script),
+    git_commit_short: gitCommit(),
+    git_commit: gitCommitHash(),
   ]
 
   return parameters
