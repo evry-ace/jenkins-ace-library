@@ -2,7 +2,7 @@
 
 import no.ace.Terraform
 
-@SuppressWarnings(['UnnecessaryObjectReferences'])
+@SuppressWarnings(['MethodSize', 'UnnecessaryObjectReferences'])
 Object call(String environment, Map opts = [:], Object body) {
   Boolean init = opts.containsKey('init') ? opts.init : true
   String provider = opts.provider ?: 'azure'
@@ -54,6 +54,15 @@ Object call(String environment, Map opts = [:], Object body) {
   body.show = { ->
     String script = "terraform plan -no-color ${planFile}"
     return sh(returnStdout: true, script: script)
+  }
+
+  body.output = { String path, String key = '' ->
+    String script = 'terraform output'
+    if (key) {
+      script.append(key)
+    }
+    String output = sh(returnStdout: true, script: script.join(' '))
+    writeFile file: path, text: output
   }
 
   body.apply = { ->
