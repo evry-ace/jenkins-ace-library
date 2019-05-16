@@ -57,7 +57,7 @@ Object call(String environment, Map opts = [:], Object body) {
   }
 
   body.output = { String writeToPath, String key = '' ->
-    String script = 'terraform output'
+    List<String> script = ['terraform', 'output']
     if (key) {
       script.append(key)
     }
