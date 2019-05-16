@@ -59,7 +59,7 @@ Object call(String environment, Map opts = [:], Object body) {
   body.output = { String writeToPath, String key = '' ->
     List<String> script = ['terraform', 'output']
     if (key) {
-      script.append(key)
+      script.add(key)
     }
     String output = sh(returnStdout: true, script: script.join(' '))
     writeFile file: writeToPath, text: output
