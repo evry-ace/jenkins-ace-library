@@ -17,7 +17,7 @@ Object call(String environment, Map opts = [:], Object body) {
   List varfilesExtra = opts.varfilesExtra ?: []
   String varfiles = Terraform.varFiles(varfilesDir, varfilesDefault, varfilesExtra)
 
-  String dockerImage = opts.dockerImage ?: 'hashicorp/terraform:light'
+  String dockerImage = opts.dockerImage ?: 'ngeor/az-helm-kubectl-terraform:2.12.3__1.12.6__0.11.13'
   String dockerArgs = ["--entrypoint=''", "-e HELM_HOME=${env.WORKSPACE}"].join(' ')
 
   String workspace = opts.workspace ?: environment
