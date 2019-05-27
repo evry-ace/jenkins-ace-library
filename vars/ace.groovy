@@ -35,7 +35,6 @@ Object setupNotifier(Object body) {
       String notifyUrl = env.TEAMS_NOTIFY_URL ?: notifications
       String alertUrl = env.TEAMS_ALERT_URL ?: alerts
 
-      office365ConnectorSend webhookUrl: notifyUrl, message: "foo"
       println("Teams webhook url lengths: ${notifyUrl.length()} ${alertUrl.length()}")
       chat = new Teams(body, notifyUrl, alertUrl)
     }

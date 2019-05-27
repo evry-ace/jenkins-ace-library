@@ -18,7 +18,7 @@ class Teams extends Notifier {
 
   Teams notifyStarted() {
     script.office365ConnectorSend(
-      message: formatMessage('STARTED'),
+      message: formatMessage(script, 'STARTED'),
       status: 'STARTED',
       webhookUrl: notificationsWebhookUrl
     )
