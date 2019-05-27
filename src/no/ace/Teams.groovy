@@ -17,8 +17,9 @@ class Teams extends Notifier {
   }
 
   Teams notifyStarted() {
+    String msg = formatMessage(script, 'STARTED')
     script.office365ConnectorSend(
-      message: formatMessage(script, 'STARTED'),
+      message: msg,
       status: 'STARTED',
       webhookUrl: notificationsWebhookUrl
     )
@@ -27,8 +28,9 @@ class Teams extends Notifier {
   }
 
   Teams notifyInput(String message = '') {
+    String msg = formatMessage(script, 'PENDING INPUT', message)
     script.office365ConnectorSend(
-      message: formatMessage(script, 'PENDING INPUT', message),
+      message: msg,
       status: 'PENDING INPUT',
       webhookUrl: notificationsWebhookUrl
     )
@@ -37,8 +39,9 @@ class Teams extends Notifier {
   }
 
   Teams notifyDeploy(String env) {
+    String msg = formatMessage(script, "DEPLOYED_TO_${env}")
     script.office365ConnectorSend(
-      message: formatMessage(script, "DEPLOYED_TO_${env}", message),
+      message: msg,
       status: "DEPLOYED_TO ${env}",
       webhookUrl: notificationsWebhookUrl
     )
@@ -47,8 +50,9 @@ class Teams extends Notifier {
   }
 
   Teams notifySuccessful() {
+    String msg = formatMessage(script, 'SUCCESSFUL')
     script.office365ConnectorSend(
-      message: formatMessage(script, 'SUCCESSFUL', message),
+      message: msg,
       status: 'SUCCESSFUL',
       webhookUrl: notificationsWebhookUrl
     )
@@ -57,8 +61,9 @@ class Teams extends Notifier {
   }
 
   Teams notifyFailed() {
+    String msg = formatMessage(script, 'FAILED')
     script.office365ConnectorSend(
-      message: formatMessage(script, 'FAILED', message),
+      message: msg,
       status: 'FAILED',
       webhookUrl: notificationsWebhookUrl
     )
@@ -66,8 +71,9 @@ class Teams extends Notifier {
   }
 
   Teams notifyAborted() {
+    String msg = formatMessage(script, 'ABORTED')
     script.office365ConnectorSend(
-      message: formatMessage(script, 'ABORTED', message),
+      message: msg,
       status: 'ABORTED',
       webhookUrl: notificationsWebhookUrl
     )
