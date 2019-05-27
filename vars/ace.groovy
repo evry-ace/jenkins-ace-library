@@ -33,7 +33,7 @@ Object setupNotifier(Object body) {
     withCredentials(creds) {
       String notifyUrl = env.TEAMS_NOTIFY_URL ?: notifications
       String alertUrl = env.TEAMS_ALERT_URL ?: alerts
-      println("${notifyUrl} ${alertUrl}")
+      println("${notifyUrl.length()} ${alertUrl.length()}")
       return new Teams(body, notifyUrl, alertUrl)
     }
   }
