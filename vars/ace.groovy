@@ -77,8 +77,8 @@ void call(Map options = [:], Object body) {
 
         body()
       } catch (err) {
-        if (body.hasProperty('slack') && body.slack) {
-          body.slack.notifyFailed()
+        if (body.getBinding().hasVariable('chat')) {
+                  body.chat.notifyFailed()
         }
         throw err
       } finally {
