@@ -3,7 +3,7 @@ package no.ace
 
 // https://jenkins.io/doc/pipeline/steps/slack/
 
-class Slack implements Notifier {
+class Slack extends Notifier {
   Object script
   String channel
   String alerts

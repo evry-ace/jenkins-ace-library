@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 package no.ace
 
-class NoopNotifier implements Notifier {
+class NoopNotifier extends Notifier {
   Object script
 
   NoopNotifier(

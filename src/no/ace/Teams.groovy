@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 package no.ace
 
-class Teams implements Notifier {
+class Teams extends Notifier {
   Object script
   String notificationsWebhookUrl
   String alertsWebhookUrl
