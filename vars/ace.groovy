@@ -7,7 +7,9 @@ import no.ace.Docker
 
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
 Object setupNotifier(Object body) {
-  if (body.ace?.contact?.slack || contact?.slack_notifications) {
+  Object contact = body.ace?.contact
+
+  if (contact?.slack || contact?.slack_notifications) {
     String notifications = contact.slack?.notifications ?: contact.slack_notifications
     String alerts = contact.slack?.alerts ?: contact.slack_alerts ?: notifications
 
