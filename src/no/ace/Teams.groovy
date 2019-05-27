@@ -39,7 +39,8 @@ class Teams implements Serializable {
   Teams notifyDeploy(String env) {
     script.office365ConnectorSend(
       message: "We are deploying to ${env}",
-      status: "DEPLOYED_TO ${env}",
+      status: "DEPLOYED_TO(${env})",
+      color: 'green',
       webhookUrl: notificationsWebhookUrl
     )
 
@@ -50,6 +51,7 @@ class Teams implements Serializable {
     script.office365ConnectorSend(
       message: 'Build was successful',
       status: 'SUCCESSFUL',
+      color: 'green',
       webhookUrl: notificationsWebhookUrl
     )
 
@@ -60,6 +62,7 @@ class Teams implements Serializable {
     script.office365ConnectorSend(
       message: 'Build tripped and failed',
       status: 'FAILED',
+      color: 'red',
       webhookUrl: notificationsWebhookUrl
     )
     return this
@@ -69,6 +72,7 @@ class Teams implements Serializable {
     script.office365ConnectorSend(
       message: 'Build was aborted.',
       status: 'ABORTED',
+      color: 'red'm
       webhookUrl: notificationsWebhookUrl
     )
 
