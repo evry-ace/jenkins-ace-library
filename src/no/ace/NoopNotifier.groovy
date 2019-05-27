@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 package no.ace
 
-class NoopNotifier extends Notifier {
+class NoopNotifier implements Serializable {
   Object script
 
   NoopNotifier(

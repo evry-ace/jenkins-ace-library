@@ -9,7 +9,7 @@ import no.ace.Docker
 Object setupNotifier(Object body) {
   Object contact = body.ace?.contact
 
-  Object chat;
+  Object chat
   if (contact?.slack || contact?.slack_notifications) {
     String notifications = contact.slack?.notifications ?: contact.slack_notifications
     String alerts = contact.slack?.alerts ?: contact.slack_alerts ?: notifications
