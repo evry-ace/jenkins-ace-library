@@ -31,11 +31,11 @@ Object setupNotifier(Object body) {
     withCredentials(creds) {
       String notifyUrl = env.TEAMS_NOTIFY_URL ?: notifications
       String alertUrl = env.TEAMS_ALERT_URL ?: alerts
-      return new Teams(script, notifyUrl, alertUrl)
+      return new Teams(body, notifyUrl, alertUrl)
     }
   }
 
-  return new NoopNotifier(script)
+  return new NoopNotifier(body)
 }
 
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
