@@ -60,11 +60,9 @@ void call(Map options = [:], Object body) {
             body.ace.helm.image = new Docker(this).image()
           }
 
-          Object contact = body.ace?.contact?
-          body.chat = setupNotifier(contact)
-
+          body.chat = setupNotifier(body)
           // Backwards compability with old slack_notifications definition
-          if (contact?.slack_notifications) {
+          if (body.ace?.contact?.slack_notifications) {
             body.slack = body.chat
             deprecatedWarn 'contact.slack_notifications has been deprectated'
             deprecatedWarn 'use contact.slack.notifications instead!'
