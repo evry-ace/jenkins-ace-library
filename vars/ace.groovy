@@ -21,10 +21,12 @@ Object setupNotifier(Object body) {
 
     List<String> creds = []
     if (!notifications.startsWith('https')) {
+      println("Using secret ${alerts} for notifications to Teams")
       creds.add(string(credentialsId: notifications, variable: 'TEAMS_NOTIFY_URL'))
     }
 
     if (!alerts.startsWith('https')) {
+      println("Using secret ${alerts} for alerts to Teams")
       creds.add(string(credentialsId: alerts, variable: 'TEAMS_ALERT_URL'))
     }
 
