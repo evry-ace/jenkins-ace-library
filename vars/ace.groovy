@@ -72,11 +72,12 @@ void call(Map options = [:], Object body) {
           body.chat = setupNotifier(body)
           // Backwards compability with old slack_notifications definition
           if (body.ace?.contact?.slack_notifications) {
-            body.slack = body.chat
             deprecatedWarn 'contact.slack_notifications has been deprectated'
             deprecatedWarn 'use contact.slack.notifications instead!'
           }
-          println(body.chat)
+
+          body.slack = body.chat
+
           body.chat.notifyStarted()
 
           // Ace Docker Image Build
