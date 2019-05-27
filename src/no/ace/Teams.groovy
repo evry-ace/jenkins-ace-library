@@ -38,7 +38,7 @@ class Teams implements Serializable {
 
   Teams notifyDeploy(String env) {
     script.office365ConnectorSend(
-      message: "We are deploying to ${env}",
+      message: "We have deployed to ${env}",
       status: "DEPLOYED_TO(${env})",
       color: 'green',
       webhookUrl: notificationsWebhookUrl
