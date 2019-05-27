@@ -8,12 +8,6 @@ class Slack implements Serializable {
   String channel
   String alerts
 
-  Slack(Object script, String channel, String alerts = null) {
-    this.script = script
-    this.channel = channel
-    this.alerts = alerts
-  }
-
   String commitAuthor() {
     String name
 
@@ -26,7 +20,10 @@ class Slack implements Serializable {
     return name
   }
 
-  String formatMessage(String buildStatus = 'STARTED', String buildSubject = '') {
+  String formatMessage(
+    String buildStatus = 'STARTED',
+    String buildSubject = ''
+  ) {
     String buildUrl = script.env.BUILD_URL
     String subject
     String message
@@ -35,7 +32,7 @@ class Slack implements Serializable {
       String jobName = script.env.JOB_NAME
       String buildNum = script.env.BUILD_NUMBER
 
-      String commitAuthor = commitAuthor()
+      String commitAuthor = commitAuthor(script)
       subject = "${buildStatus}: Job ${jobName} build #${buildNum} by ${commitAuthor}"
     } else {
       subject = "${buildStatus}: ${subject}"
@@ -50,12 +47,18 @@ class Slack implements Serializable {
     return message
   }
 
+  Slack(Object script, String channel, String alerts = null) {
+    this.script = script
+    this.channel = channel
+    this.alerts = alerts
+  }
+
   Slack customMessage(String buildStatus, String message) {
     script.slackSend(
       color: 'warning',
       channel: channel,
       notify: false,
-      message: formatMessage(buildStatus, message)
+      message: formatMessage(script, buildStatus, message)
     )
 
     return this
@@ -66,7 +69,7 @@ class Slack implements Serializable {
       color: 'warning',
       channel: channel,
       notify: false,
-      message: formatMessage('STARTED')
+      message: formatMessage(script, 'STARTED')
     )
 
     return this
@@ -77,7 +80,7 @@ class Slack implements Serializable {
       color: 'warning',
       channel: channel,
       notify: true,
-      message: formatMessage('PENDING INPUT', message)
+      message: formatMessage(script, 'PENDING INPUT', message)
     )
 
     return this
@@ -88,7 +91,7 @@ class Slack implements Serializable {
       color: 'good',
       channel: channel,
       notify: false,
-      message: formatMessage("DEPLOYED TO ${env}")
+      message: formatMessage(script, "DEPLOYED TO ${env}")
     )
 
     return this
@@ -99,7 +102,7 @@ class Slack implements Serializable {
       color: 'good',
       channel: channel,
       notify: false,
-      message: formatMessage('SUCCESSFUL')
+      message: formatMessage(script, 'SUCCESSFUL')
     )
 
     return this
@@ -110,7 +113,7 @@ class Slack implements Serializable {
       color: 'danger',
       channel: alerts ?: channel,
       notify: true,
-      message: formatMessage('FAILED')
+      message: formatMessage(script, 'FAILED')
     )
 
     return this
@@ -121,7 +124,7 @@ class Slack implements Serializable {
       color: 'danger',
       channel: channel,
       notify: false,
-      message: formatMessage('ABORTED')
+      message: formatMessage(script, 'ABORTED')
     )
 
     return this

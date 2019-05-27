@@ -4,12 +4,12 @@ void call(String message, Map opts = [:]) {
   Integer timeout = opts['timeout'] ?: 0
   String timeoutUnit = opts['timeoutUnit'] ?: 'MINUTES'
 
-  Object slack = opts.slack ?: null
+  Object chat = opts.chat ?: null
 
   milestone()
 
-  if (slack != null) {
-    slack.notifyInput(message)
+  if (chat != null) {
+    chat.notifyInput(message)
   }
 
   if (timeout > 0) {
