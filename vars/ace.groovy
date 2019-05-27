@@ -100,7 +100,9 @@ void call(Map options = [:], Object body) {
 
         body()
       } catch (err) {
-        body.chat.notifyFailed()
+        if (body.hasProperty('chat') && body.chat) {
+          body.chat.notifyFailed()
+        }
         throw err
       } finally {
         step([$class: 'WsCleanup'])
