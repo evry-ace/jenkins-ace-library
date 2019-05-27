@@ -1,5 +1,4 @@
 #!/usr/bin/env groovy
-
 package no.ace
 
 class Teams implements Notifier {

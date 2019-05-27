@@ -13,7 +13,11 @@ class Notifier implements Serializable {
     return name
   }
 
-  static String formatMessage(Object script, String buildStatus = 'STARTED', String buildSubject = '') {
+  static String formatMessage(
+    Object script,
+    String buildStatus = 'STARTED',
+    String buildSubject = ''
+  ) {
     String buildUrl = script.env.BUILD_URL
     String subject
     String message

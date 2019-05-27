@@ -4,6 +4,25 @@ import no.ace.Slack
 import no.ace.Teams
 import no.ace.Docker
 
+@SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
+Object setupNotifier(Object body) {
+  if (body.ace?.contact?.slack || contact?.slack_notifications) {
+    String notifications = contact.slack?.notifications ?: contact.slack_notifications
+    String alerts = contact.slack?.alerts ?: contact.slack_alerts ?: notifications
+
+    return new Slack(body, notifications, alerts)
+  } else if (contact?.teams) {
+    Object teams = contact.teams
+    String notifications = teams.notifications ?: 'TeamsNotificationWebhook'
+    String alerts = teams.alerts ?: notifications
+
+    return new Teams(script, notifications, alerts)
+  }
+
+  return new NoopNotifier(script)
+}
+
+@SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
 void call(Map options = [:], Object body) {
   Boolean debug = options.containsKey('debug') ? options.debug : true
   String workspace = options.workspace ?: '/home/jenkins/workspace'
@@ -27,27 +46,17 @@ void call(Map options = [:], Object body) {
             body.ace.helm.image = new Docker(this).image()
           }
 
-          def contact = body.ace?.contact
-          if (contact?.slack || contact?.slack_notifications) {
-            def notifications = contact.slack?.notifications ?: contact.slack_notifications
-            def alerts = contact.slack?.alerts ?: contact.slack_alerts ?: channel
+          Object contact = body.ace?.contact
+          body.chat = setupNotifier(contact)
 
-            body.chat = new Slack(this, notifications, alerts)
-            body.chat.notifyStarted()
-
-            // Backwards compability with old slack_notifications definition
-            if (body.ace.contact.slack_notifications) {
-              body.slack = body.chat
-              println "[DEPRECTION WARNING] contact.slack_notifications has been deprectated"
-              println "[DEPRECTION WARNING] use contact.slack.notifications instead!"
-            }
-          } else if (contact?.teams) {
-            def notifications = contact.teams.notifications ?: 'TeamsNotificationWebhook'
-            def alerts = contact.teams.alerts ?: notifications
-
-            body.chat = new Teams(this, notifications, alerts)
-            body.chat.notifyStarted()
+          // Backwards compability with old slack_notifications definition
+          if (contact?.slack_notifications) {
+            body.slack = body.chat
+            deprecatedWarn 'contact.slack_notifications has been deprectated'
+            deprecatedWarn 'use contact.slack.notifications instead!'
           }
+
+          body.chat.notifyStarted()
 
           // Ace Docker Image Build
           body.dockerBuild = { path = '.', opts = [:] ->
@@ -77,9 +86,7 @@ void call(Map options = [:], Object body) {
 
         body()
       } catch (err) {
-        if (body.getBinding().hasVariable('chat')) {
-                  body.chat.notifyFailed()
-        }
+        body.chat.notifyFailed()
         throw err
       } finally {
         step([$class: 'WsCleanup'])
