@@ -20,7 +20,7 @@ class Teams implements Notifier {
   Teams notifyStarted() {
     script.office365ConnectorSend(
       message: formatMessage('STARTED'),
-      status: "STARTED",
+      status: 'STARTED',
       webhookUrl: notificationsWebhookUrl
     )
 
@@ -30,7 +30,7 @@ class Teams implements Notifier {
   Teams notifyInput(String message = '') {
     script.office365ConnectorSend(
       message: formatMessage(script, 'PENDING INPUT', message),
-      status: "PENDING INPUT",
+      status: 'PENDING INPUT',
       webhookUrl: notificationsWebhookUrl
     )
 
@@ -49,8 +49,8 @@ class Teams implements Notifier {
 
   Teams notifySuccessful() {
     script.office365ConnectorSend(
-      message: formatMessage(script, "SUCCESSFUL", message),
-      status: "SUCCESSFUL",
+      message: formatMessage(script, 'SUCCESSFUL', message),
+      status: 'SUCCESSFUL',
       webhookUrl: notificationsWebhookUrl
     )
 
@@ -59,8 +59,8 @@ class Teams implements Notifier {
 
   Teams notifyFailed() {
     script.office365ConnectorSend(
-      message: formatMessage(script, "FAILED", message),
-      status: "FAILED",
+      message: formatMessage(script, 'FAILED', message),
+      status: 'FAILED',
       webhookUrl: notificationsWebhookUrl
     )
     return this
@@ -68,8 +68,8 @@ class Teams implements Notifier {
 
   Teams notifyAborted() {
     script.office365ConnectorSend(
-      message: formatMessage(script, "ABORTED", message),
-      status: "ABORTED",
+      message: formatMessage(script, 'ABORTED', message),
+      status: 'ABORTED',
       webhookUrl: notificationsWebhookUrl
     )
 

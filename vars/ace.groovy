@@ -28,7 +28,7 @@ void call(Map options = [:], Object body) {
           }
 
           def contact = body.ace?.contact
-          if (contact?.slack ||| contact?.slack_notifications) {
+          if (contact?.slack || contact?.slack_notifications) {
             def notifications = contact.slack?.notifications ?: contact.slack_notifications
             def alerts = contact.slack?.alerts ?: contact.slack_alerts ?: channel
 
