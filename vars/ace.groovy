@@ -9,11 +9,12 @@ import no.ace.Docker
 Object setupNotifier(Object body) {
   Object contact = body.ace?.contact
 
+  Object chat;
   if (contact?.slack || contact?.slack_notifications) {
     String notifications = contact.slack?.notifications ?: contact.slack_notifications
     String alerts = contact.slack?.alerts ?: contact.slack_alerts ?: notifications
 
-    return new Slack(body, notifications, alerts)
+    chat = new Slack(body, notifications, alerts)
   } else if (contact?.teams) {
     Object teams = contact.teams
     String notifications = teams.notifications ?: 'TeamsNotificationWebhook'
@@ -21,24 +22,28 @@ Object setupNotifier(Object body) {
 
     List<String> creds = []
     if (!notifications.startsWith('https')) {
-      println("Using secret ${alerts} for notifications to Teams")
+      println("Teams using secret: ${alerts} for notifications")
       creds.add(string(credentialsId: notifications, variable: 'TEAMS_NOTIFY_URL'))
     }
 
     if (!alerts.startsWith('https')) {
-      println("Using secret ${alerts} for alerts to Teams")
+      println("Teams using secret: ${alerts} for alerts")
       creds.add(string(credentialsId: alerts, variable: 'TEAMS_ALERT_URL'))
     }
 
     withCredentials(creds) {
       String notifyUrl = env.TEAMS_NOTIFY_URL ?: notifications
       String alertUrl = env.TEAMS_ALERT_URL ?: alerts
-      println("${notifyUrl.length()} ${alertUrl.length()}")
-      return new Teams(body, notifyUrl, alertUrl)
+
+      office365ConnectorSend webhookUrl: notifyUrl, message: "foo"
+      println("Teams webhook url lengths: ${notifyUrl.length()} ${alertUrl.length()}")
+      chat = new Teams(body, notifyUrl, alertUrl)
     }
+  } else {
+    chat = new NoopNotifier(body)
   }
 
-  return new NoopNotifier(body)
+  return chat
 }
 
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
@@ -72,7 +77,7 @@ void call(Map options = [:], Object body) {
             deprecatedWarn 'contact.slack_notifications has been deprectated'
             deprecatedWarn 'use contact.slack.notifications instead!'
           }
-
+          println(body.chat)
           body.chat.notifyStarted()
 
           // Ace Docker Image Build
