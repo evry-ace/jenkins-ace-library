@@ -16,7 +16,20 @@ Object setupNotifier(Object body) {
     String notifications = teams.notifications ?: 'TeamsNotificationWebhook'
     String alerts = teams.alerts ?: notifications
 
-    return new Teams(script, notifications, alerts)
+    List<String> creds = []
+    if (!notifications.startsWith('https')) {
+      creds.add(string(credentialsId: notifications, variable: 'TEAMS_NOTIFY_URL'))
+    }
+
+    if (!alerts.startsWith('https')) {
+      creds.add(string(credentialsId: alerts, variable: 'TEAMS_ALERT_URL'))
+    }
+
+    withCredentials(creds) {
+      String notifyUrl = env.TEAMS_NOTIFY_URL ?: notifications
+      String alertUrl = env.TEAMS_ALERT_URL ?: alerts
+      return new Teams(script, notifyUrl, alertUrl)
+    }
   }
 
   return new NoopNotifier(script)
