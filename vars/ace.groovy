@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 
 import no.ace.Slack
+import no.ace.Teams
 import no.ace.Docker
 
 void call(Map options = [:], Object body) {
@@ -26,12 +27,26 @@ void call(Map options = [:], Object body) {
             body.ace.helm.image = new Docker(this).image()
           }
 
-          if (body.ace?.contact?.slack_notifications) {
-            String channel = body.ace.contact.slack_notifications
-            String alerts = body.ace.contact.slack_alerts ?: channel
+          def contact = body.ace?.contact
+          if (contact?.slack ||| contact?.slack_notifications) {
+            def notifications = contact.slack?.notifications ?: contact.slack_notifications
+            def alerts = contact.slack?.alerts ?: contact.slack_alerts ?: channel
 
-            body.slack = new Slack(this, channel, alerts)
-            body.slack.notifyStarted()
+            body.chat = new Slack(this, notifications, alerts)
+            body.chat.notifyStarted()
+
+            // Backwards compability with old slack_notifications definition
+            if (body.ace.contact.slack_notifications) {
+              body.slack = body.chat
+              println "[DEPRECTION WARNING] contact.slack_notifications has been deprectated"
+              println "[DEPRECTION WARNING] use contact.slack.notifications instead!"
+            }
+          } else if (contact?.teams) {
+            def notifications = contact.teams.notifications ?: 'TeamsNotificationWebhook'
+            def alerts = contact.teams.alerts ?: notifications
+
+            body.chat = new Teams(this, notifications, alerts)
+            body.chat.notifyStarted()
           }
 
           // Ace Docker Image Build
