@@ -1,5 +1,6 @@
 #!/usr/bin/env groovy
 
+import no.ace.NoopNotifier
 import no.ace.Slack
 import no.ace.Teams
 import no.ace.Docker
