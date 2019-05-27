@@ -28,7 +28,7 @@ class Teams implements Serializable {
 
   Teams notifyInput(String message = '') {
     script.office365ConnectorSend(
-      message: 'Build is waiting for your input',
+      message: "Build is waiting for your input (${message})",
       status: 'PENDING INPUT',
       webhookUrl: notificationsWebhookUrl
     )
@@ -72,7 +72,7 @@ class Teams implements Serializable {
     script.office365ConnectorSend(
       message: 'Build was aborted.',
       status: 'ABORTED',
-      color: 'red'm
+      color: 'red',
       webhookUrl: notificationsWebhookUrl
     )
 
