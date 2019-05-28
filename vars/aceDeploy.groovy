@@ -74,9 +74,8 @@ void call(Map config, String envName, Map opts = [:]) {
     // Get Helm Version
     docker.image("${kubectlImage}:${kubectlVersion}").inside(kubectlOpts) {
       script = '''
-        kubectl get deploy -n kube-system -o wide \
-          | grep tiller \
-          | awk '{split($8,a,":"); print a[2]}'
+        kubectl get pod -n kube-system -l app=helm,name=tiller \
+          -o jsonpath="{ .items[0].spec.containers[0].image }" | cut -d ':' -f2
       '''
       helmVersion = sh(script: script, returnStdout: true)?.trim()
 
