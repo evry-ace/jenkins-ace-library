@@ -32,7 +32,7 @@ class Slack implements Serializable {
       String jobName = script.env.JOB_NAME
       String buildNum = script.env.BUILD_NUMBER
 
-      String commitAuthor = commitAuthor(script)
+      String commitAuthor = commitAuthor()
       subject = "${buildStatus}: Job ${jobName} build #${buildNum} by ${commitAuthor}"
     } else {
       subject = "${buildStatus}: ${subject}"
