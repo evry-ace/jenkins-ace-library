@@ -58,7 +58,7 @@ class Slack implements Serializable {
       color: 'warning',
       channel: channel,
       notify: false,
-      message: formatMessage(script, buildStatus, message)
+      message: formatMessage(buildStatus, message)
     )
 
     return this
@@ -69,7 +69,7 @@ class Slack implements Serializable {
       color: 'warning',
       channel: channel,
       notify: false,
-      message: formatMessage(script, 'STARTED')
+      message: formatMessage('STARTED')
     )
 
     return this
@@ -80,7 +80,7 @@ class Slack implements Serializable {
       color: 'warning',
       channel: channel,
       notify: true,
-      message: formatMessage(script, 'PENDING INPUT', message)
+      message: formatMessage('PENDING INPUT', message)
     )
 
     return this
@@ -91,7 +91,7 @@ class Slack implements Serializable {
       color: 'good',
       channel: channel,
       notify: false,
-      message: formatMessage(script, "DEPLOYED TO ${env}")
+      message: formatMessage("DEPLOYED TO ${env}")
     )
 
     return this
@@ -102,7 +102,7 @@ class Slack implements Serializable {
       color: 'good',
       channel: channel,
       notify: false,
-      message: formatMessage(script, 'SUCCESSFUL')
+      message: formatMessage('SUCCESSFUL')
     )
 
     return this
@@ -113,7 +113,7 @@ class Slack implements Serializable {
       color: 'danger',
       channel: alerts ?: channel,
       notify: true,
-      message: formatMessage(script, 'FAILED')
+      message: formatMessage('FAILED')
     )
 
     return this
@@ -124,7 +124,7 @@ class Slack implements Serializable {
       color: 'danger',
       channel: channel,
       notify: false,
-      message: formatMessage(script, 'ABORTED')
+      message: formatMessage('ABORTED')
     )
 
     return this
