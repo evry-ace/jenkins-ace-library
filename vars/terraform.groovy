@@ -53,7 +53,7 @@ Object call(String environment, Map opts = [:], Object body) {
   }
 
   body.show = { ->
-    String script = "terraform plan -no-color ${planFile}"
+    String script = "terraform show -no-color ${planFile}"
     return sh(returnStdout: true, script: script)
   }
 
