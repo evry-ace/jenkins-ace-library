@@ -35,6 +35,11 @@ Object call(String environment, Map opts = [:], Object body) {
 
   String backendConfig = Terraform.backendConfig(stateCreds)
 
+  String terraformRc = opts.terraformRC ?: ""
+  if (terraformRc) {
+    dockerArgs.push("-e TF_CLI_CONFIG_FILE=${terraformRc}")
+  }
+
   // helper functions used inside terraform dsl
   body.get = { ->
     sh 'terraform get'
