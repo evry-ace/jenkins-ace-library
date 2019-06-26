@@ -53,6 +53,7 @@ void call(Map options = [:], Object body) {
   Boolean dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
   Boolean aceInit = options.containsKey('aceInit') ? options.aceInit : true
   String aceFile = options.aceFile ?: 'ace.yaml'
+  String shouldCleanup = options.shouldCleanup ?: true
 
   node(buildAgent) {
     buildWorkspace([workspace: workspace]) {
@@ -113,8 +114,10 @@ void call(Map options = [:], Object body) {
         }
         throw err
       } finally {
-        step([$class: 'WsCleanup'])
-        sleep 10
+        if (shouldCleanup) {
+          step([$class: 'WsCleanup'])
+          sleep 10
+        }
       }
     }
   }
