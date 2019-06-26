@@ -19,7 +19,7 @@ Object call(String environment, Map opts = [:], Object body) {
 
   String defaultImage = 'ngeor/az-helm-kubectl-terraform:2.12.3__1.12.6__0.11.13'
   String dockerImage = opts.dockerImage ?: defaultImage
-  String dockerArgs = ["--entrypoint=''", "-e HELM_HOME=${env.WORKSPACE}"].join(' ')
+  List<String> dockerArgList = ["--entrypoint=''", "-e HELM_HOME=${env.WORKSPACE}"]
 
   String workspace = opts.workspace ?: environment
   String credsPrefix = opts.credsPrefix ?: environment
@@ -39,6 +39,8 @@ Object call(String environment, Map opts = [:], Object body) {
   if (terraformRc) {
     dockerArgs.push("-e TF_CLI_CONFIG_FILE=${terraformRc}")
   }
+
+  String dockerArgs = dockerArgList.join(' ')
 
   // helper functions used inside terraform dsl
   body.get = { ->
