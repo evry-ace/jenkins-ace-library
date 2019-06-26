@@ -37,7 +37,7 @@ Object call(String environment, Map opts = [:], Object body) {
 
   String terraformRc = opts.terraformRc ?: ""
   if (terraformRc) {
-    dockerArgs.push("-e TF_CLI_CONFIG_FILE=${terraformRc}")
+    dockerArgList.push("-e TF_CLI_CONFIG_FILE=${terraformRc}")
   }
 
   String dockerArgs = dockerArgList.join(' ')
