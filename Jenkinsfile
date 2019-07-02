@@ -1,5 +1,5 @@
 #!groovy
-@Library("ace") _
+@Library("ace@container-poc") _
 
 ace([dockerSet: false]) {
   stage('Lint') {
@@ -27,11 +27,10 @@ ace([dockerSet: false]) {
   }
 
   stage('Test') {
-    def groovyImage = 'groovy'
-    def groovyVersion = 'alpine'
-    def groovyOpts = "--entrypoint=''"
+    def groovyContainer = 'groovy:alpine'
+    def groovyOpts = ["--entrypoint=''"]
 
-    docker.image("${groovyImage}:${groovyVersion}").inside(groovyOpts) {
+    aceContainer(groovyContainer, groovyOpts, [:]) {
       sh 'groovy -classpath src/:vars/:test/ test/AllTestsRunner.groovy'
     }
   }

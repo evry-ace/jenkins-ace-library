@@ -35,7 +35,7 @@ Object call(String environment, Map opts = [:], Object body) {
 
   String backendConfig = Terraform.backendConfig(stateCreds)
 
-  String terraformRc = opts.terraformRc ?: ""
+  String terraformRc = opts.terraformRc ?: ''
   if (terraformRc) {
     dockerArgList.push("-e TF_CLI_CONFIG_FILE=${terraformRc}")
   }
