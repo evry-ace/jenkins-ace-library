@@ -2,7 +2,9 @@
 
 @SuppressWarnings(['UnusedMethodParameter'])
 Object call(String image, List args = [], Map opts = [:], Object body) {
-  if (docker) {
+  Boolean hasDocker = docker && fileExists("/var/run/docker.sock")
+
+  if (hasDocker) {
     docker.image(image).inside(args.join('')) {
       body()
     }
