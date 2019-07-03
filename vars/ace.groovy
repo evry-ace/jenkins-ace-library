@@ -109,8 +109,6 @@ void call(Map options = [:], Object body) {
             aOpts = opts ?: [containers: containers]
             aOpts << [chat: body.chat, debug: debug]
 
-            println aOpts
-
             aceDeploy(body.ace, envName, aOpts)
           }
         }

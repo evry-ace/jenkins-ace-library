@@ -42,6 +42,7 @@ void call(Map config, String envName, Map opts = [:]) {
   ace.helm = ace.helm ?: [:]
   ace.helm.values = ace.helm.values ?: [:]
 
+  println "[ace] Name: ${config.name}"
   println "[ace] Configuration done."
 
   if (dockerSet) {
