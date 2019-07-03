@@ -76,6 +76,8 @@ void call(Map options = [:], Object body) {
             body.ace.helm.image = new Docker(this).image()
           }
 
+          println "[ace] Generated image name: ${body.ace.helm.image}"
+
           body.chat = setupNotifier(body)
           // Backwards compability with old slack_notifications definition
           if (body.ace?.contact?.slack_notifications) {
