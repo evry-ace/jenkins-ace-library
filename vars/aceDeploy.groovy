@@ -16,10 +16,10 @@ void call(Map config, String envName, Map opts = [:]) {
 
   Map containers = opts.containers ?: [:]
   String kubectlContainer = containers.kubectl ?: ''
-  String kubectlOpts = opts.kubectlOpts ?: ["--entrypoint=''"]
+  List<String> kubectlOpts = opts.kubectlOpts ?: ["--entrypoint=''"]
 
   String helmContainer = containers.helm ?: ''
-  String helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
+  List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
   String helmValuesFile = '.ace/values.yaml'
 
 <<<<<<< HEAD
