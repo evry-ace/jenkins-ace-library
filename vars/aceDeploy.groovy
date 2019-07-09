@@ -20,6 +20,8 @@ void call(Map config, String envName, Map opts = [:]) {
   String helmOpts = opts.helmOpts ?: "--entrypoint=''"
   String helmValuesFile = '.ace/values.yaml'
 
+  String extraParams = opts.extraParams ?: ""
+  
   def (String org, String repo, String branch) = env.JOB_NAME.split('/')
   println "org=${org}, repo=${repo}, branch=${branch}"
 
@@ -126,6 +128,7 @@ void call(Map config, String envName, Map opts = [:]) {
             --wait=${wait} \
             --timeout=${timeout} \
             --version=${helmChartVersion} \
+            ${extraParams} \
             ${helmName} \
             ${helmChart}
         """
