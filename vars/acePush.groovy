@@ -11,6 +11,8 @@ void call(Map config, String env, Object image, Map opts = [:]) {
   String name = ace.helm.image
 
   println 'Pushing to Docker Registry'
+  println ace
+  println registry
 
   withDockerRegistry([credentialsId: registry, url: "https://${registry}"]) {
     println "image=${image}, imageName=${image.imageName()}, imageId=${image.id}"
