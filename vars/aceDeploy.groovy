@@ -21,8 +21,8 @@ void call(Map config, String envName, Map opts = [:]) {
   String helmValuesFile = '.ace/values.yaml'
   String helmValuesFileTmp = '.ace/values_tmp.yaml'
 
-  String extraParams = opts.extraParams ?: ""
-  
+  String extraParams = opts.extraParams ?: ''
+    
   def (String org, String repo, String branch) = env.JOB_NAME.split('/')
   println "org=${org}, repo=${repo}, branch=${branch}"
 
