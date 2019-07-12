@@ -19,6 +19,7 @@ void call(Map config, String envName, Map opts = [:]) {
   String helmVersion = opts.helmVersion ?: 'v2.13.1'
   String helmOpts = opts.helmOpts ?: "--entrypoint=''"
   String helmValuesFile = '.ace/values.yaml'
+  String helmValuesFileTmp = '.ace/values_tmp.yaml'
 
   String extraParams = opts.extraParams ?: ""
   
@@ -67,7 +68,14 @@ void call(Map config, String envName, Map opts = [:]) {
     sh "rm ${helmValuesFile}"
   }
 
-  writeYaml file: helmValuesFile, data: ace.helm.values
+  Boolean tmpValuesFileExists = fileExists(helmValuesFileTmp)
+  if (tmpValuesFileExists) {
+    sh "rm ${helmValuesFileTmp}"
+  }
+
+  writeYaml file: helmValuesFileTmp, data: ace.helm.values
+
+  sh "envsubst < ${helmValuesFileTmp} > ${helmValuesFile}"
 
   String credId  = ace.helm.cluster
   String credVar = 'KUBECONFIG'
