@@ -83,12 +83,10 @@ void call(Map config, String envName, Map opts = [:]) {
 
   println "[ace] Wrote values ${helmValuesFile}"
 
-  String k8sConfig = opts.k8sConfig ?: ace.helm.cluster
+  String credId = opts.k8sConfigCredId ?: ace.helm.cluster
+  Map credsOpts = [k8sConfigCredIt: credId]
 
-  String credVar = 'KUBECONFIG'
-  Map credsOpts = [k8sConfig: k8sConfig]
-
-  credsWrap([file(credentialsId: credId, variable: credVar)], credsOpts) {
+  credsWrap(credsOpts) {
     // Get Helm Version
     // @TODO this will not work properly due to the image name
     aceContainer(kubectlContainer, kubectlOpts, [:]) {

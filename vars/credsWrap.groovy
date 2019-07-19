@@ -3,7 +3,9 @@
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
 void call(Object creds, Map opts, Object body) {
   if (opts.k8sConfig) {
-    withCredentials([file(credentialsId: credId, variable: credVar)]) {
+
+    String credVar = 'KUBECONFIG'
+    withCredentials([file(credentialsId: opts.k8sConfigCredId, variable: credVar)]) {
       body()
     }
   } else {
