@@ -1,7 +1,7 @@
 // Internal utlity function
 
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
-void call(Object creds, Map opts, Object body) {
+void call(Map opts, Object body) {
   if (opts.k8sConfig) {
 
     String credVar = 'KUBECONFIG'
