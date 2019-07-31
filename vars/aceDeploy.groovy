@@ -27,6 +27,8 @@ void call(Map config, String envName, Map opts = [:]) {
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
   String helmValuesFile = '.ace/values.yaml'
 
+  println "[ace] Got containers ${containers}"
+
   println "[ace] Job name: ${env.JOB_NAME}"
 
   def (String org, String jobName, String branch) = getParts(env.JOB_NAME)
