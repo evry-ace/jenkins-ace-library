@@ -23,7 +23,7 @@ class Docker implements Serializable {
       } else {
         name = this.scrubName("${list[0]}/${list[1]}".replaceAll(/[^A-Za-z0-9-\/]/, '-'))
       }
-    } else if(list.size() == 2) {
+    } else if (list.size() == 2) {
       name = this.scrubName(list[0])
     } else {
       name = this.scrubName(this.script.env.JOB_NAME)

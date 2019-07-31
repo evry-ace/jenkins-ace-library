@@ -2,6 +2,11 @@
 
 import no.ace.Config
 
+List<Object> getParts(String name) {
+  List<String> parts = name.split('/')
+  return parts.size() == 2 ? [null] + parts : parts
+}
+
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
 void call(Map config, String envName, Map opts = [:]) {
   print "[ace] Deplying to ${envName}"
@@ -22,18 +27,10 @@ void call(Map config, String envName, Map opts = [:]) {
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
   String helmValuesFile = '.ace/values.yaml'
 
-<<<<<<< HEAD
-  String extraParams = opts.extraParams ?: ""
-  
-  def (String org, String repo, String branch) = env.JOB_NAME.split('/')
-  println "org=${org}, repo=${repo}, branch=${branch}"
-=======
   println "[ace] Job name: ${env.JOB_NAME}"
 
-  List<String> nameParts = env.JOB_NAME.split('/')
-  def (String org, String jobName, String branch) = nameParts.size() == 2 ? [null] + nameParts : nameParts
+  def (String org, String jobName, String branch) = getParts(env.JOB_NAME)
   println "[ace] org=${org}, repo=${jobName}, branch=${branch}"
->>>>>>> deploy: Support using alt container
 
   // @TODO this logic could be moved to the Config Class
   config.name = config.name ?: jobName
@@ -43,7 +40,7 @@ void call(Map config, String envName, Map opts = [:]) {
   ace.helm.values = ace.helm.values ?: [:]
 
   println "[ace] Name: ${config.name}"
-  println "[ace] Configuration done."
+  println '[ace] Configuration done.'
 
   if (dockerSet) {
     ace.helm.values.image = ace.helm.values.image ?: [:]
