@@ -99,7 +99,8 @@ void call(Map options = [:], Object body) {
 
           // Ace Docker Image Push
           body.dockerPush = { envName = '', opts = [:] ->
-            aOpts = opts ?: [containers: containers]
+            aOpts = opts ?: [:]
+            aOpts.containers = aOpts.containers ?: containers
             aOpts << [chat: body.chat, debug: debug]
 
             acePush(body.ace, envName, body.image, aOpts)
@@ -107,7 +108,8 @@ void call(Map options = [:], Object body) {
 
           // Ace Helm Deploy
           body.deploy = { envName, opts = [:] ->
-            aOpts = opts ?: [containers: containers]
+            aOpts = opts ?: [:]
+            aOpts.containers = aOpts.containers ?: containers
             aOpts << [chat: body.chat, debug: debug]
 
             aceDeploy(body.ace, envName, aOpts)
