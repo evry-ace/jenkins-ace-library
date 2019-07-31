@@ -80,7 +80,8 @@ void call(Map config, String envName, Map opts = [:]) {
 
   writeYaml file: helmValuesFile, data: ace.helm.values
 
-  println "[ace] Wrote values ${helmValuesFile}"
+  println "[ace] Wrote values to ${helmValuesFile}"
+  println "[ace] Values are: ${readFile helmValuesFile}"
 
   String credId = opts.k8sConfigCredId ?: ace.helm.cluster
   Map credsOpts = [k8sConfigCredIt: credId]
