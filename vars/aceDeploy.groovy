@@ -2,35 +2,45 @@
 
 import no.ace.Config
 
+List<Object> getParts(String name) {
+  List<String> parts = name.split('/')
+  return parts.size() == 2 ? [null] + parts : parts
+}
+
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
 void call(Map config, String envName, Map opts = [:]) {
+  print "[ace] Deplying to ${envName}"
+
   // String  acefile = opts.acefile ?: 'ace.yaml'
   Boolean debug = opts.containsKey('debug') ? opts.debug : true
   Boolean dryrun = opts.dryrun ?: false
   Boolean wait = opts.containsKey('wait') ? opts.wait : true
   Integer timeout = opts.timeout ?: 600
+
   Boolean dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
 
-  String kubectlImage = opts.kubectlImage ?: 'lachlanevenson/k8s-kubectl'
-  String kubectlVersion = opts.kubectlVersion ?: 'v1.12.7'
-  String kubectlOpts = opts.kubectlOpts ?: "--entrypoint=''"
+  Map containers = opts.containers ?: [:]
+  String kubectlContainer = containers.kubectl ?: ''
+  List<String> kubectlOpts = opts.kubectlOpts ?: ["--entrypoint=''"]
 
-  String helmImage = opts.helmImage ?: 'lachlanevenson/k8s-helm'
-  String helmVersion = opts.helmVersion ?: 'v2.13.1'
-  String helmOpts = opts.helmOpts ?: "--entrypoint=''"
+  String helmContainer = containers.helm ?: ''
+  List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
   String helmValuesFile = '.ace/values.yaml'
 
-  String extraParams = opts.extraParams ?: ""
-  
-  def (String org, String repo, String branch) = env.JOB_NAME.split('/')
-  println "org=${org}, repo=${repo}, branch=${branch}"
+  println "[ace] Job name: ${env.JOB_NAME}"
+
+  def (String org, String jobName, String branch) = getParts(env.JOB_NAME)
+  println "[ace] org=${org}, repo=${jobName}, branch=${branch}"
 
   // @TODO this logic could be moved to the Config Class
-  config.name = config.name ?: repo
+  config.name = config.name ?: jobName
 
   Map ace = Config.parse(config, envName)
   ace.helm = ace.helm ?: [:]
   ace.helm.values = ace.helm.values ?: [:]
+
+  println "[ace] Name: ${config.name}"
+  println '[ace] Configuration done.'
 
   if (dockerSet) {
     ace.helm.values.image = ace.helm.values.image ?: [:]
@@ -59,8 +69,7 @@ void call(Map config, String envName, Map opts = [:]) {
   String helmChart = ace.helm.chart
   String helmChartVersion = ace.helm.version
 
-  println ace.helm.values
-  println "Writing ace.helm.values to ${helmValuesFile}..."
+  println "[ace] Writing values '${ace.helm.values}' -> ${helmValuesFile}"
 
   Boolean valuesFileExists = fileExists(helmValuesFile)
   if (valuesFileExists) {
@@ -69,23 +78,27 @@ void call(Map config, String envName, Map opts = [:]) {
 
   writeYaml file: helmValuesFile, data: ace.helm.values
 
-  String credId  = ace.helm.cluster
-  String credVar = 'KUBECONFIG'
+  println "[ace] Wrote values ${helmValuesFile}"
 
-  withCredentials([file(credentialsId: credId, variable: credVar)]) {
+  String credId = opts.k8sConfigCredId ?: ace.helm.cluster
+  Map credsOpts = [k8sConfigCredIt: credId]
+
+  credsWrap(credsOpts) {
     // Get Helm Version
-    docker.image("${kubectlImage}:${kubectlVersion}").inside(kubectlOpts) {
+    // @TODO this will not work properly due to the image name
+    aceContainer(kubectlContainer, kubectlOpts, [:]) {
       script = '''
         kubectl get pod -n kube-system -l app=helm,name=tiller \
           -o jsonpath="{ .items[0].spec.containers[0].image }" | cut -d ':' -f2
       '''
       helmVersion = sh(script: script, returnStdout: true)?.trim()
 
-      println "Helm version discovered: ${helmVersion}"
+      println "[ace] Helm version discovered: ${helmVersion}"
     }
 
     // Deploy Helm Release
-    docker.image("${helmImage}:${helmVersion}").inside(helmOpts) {
+    // @TODO this will not work properly due to the image name
+    aceContainer(helmContainer, helmOpts, [:]) {
       sh """
         set -u
         set -e
@@ -137,8 +150,8 @@ void call(Map config, String envName, Map opts = [:]) {
           try {
             sh(script: "helm delete ${helmName} --purge", returnStatus: true)
           } catch (e) {
-            println 'Helm purge failed'
-            println e
+            println '[ace] Helm purge failed'
+            println "[ace] ${e}"
           }
         }
 
