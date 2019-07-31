@@ -15,7 +15,7 @@ Boolean hasDocker() {
 @SuppressWarnings(['UnusedMethodParameter'])
 Object call(String image, List args = [], Map opts = [:], Object body) {
   if (hasDocker()) {
-    docker.image(image).inside(args.join('')) {
+    docker.image(image).inside(args.join(' ')) {
       body()
     }
   } else {
