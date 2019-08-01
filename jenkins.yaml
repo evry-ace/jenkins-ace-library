@@ -41,10 +41,10 @@ spec:
         resources:
           limits:
             cpu: 1
-            memory: 4Gi
+            memory: 1Gi
           requests:
             cpu: 1
-            memory: 4Gi
+            memory: 1Gi
       - name: backup # container responsible for backup and restore
         env:
         - name: BACKUP_DIR
