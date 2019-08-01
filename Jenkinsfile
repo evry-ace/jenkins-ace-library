@@ -1,5 +1,5 @@
 #!groovy
-@Library("ace@container-poc") _
+@Library("ace") _
 
 ace([dockerSet: false]) {
   stage('Lint') {
@@ -27,11 +27,66 @@ ace([dockerSet: false]) {
   }
 
   stage('Test') {
-    def groovyContainer = 'groovy:alpine'
-    def groovyOpts = ["--entrypoint=''"]
+    String binPath = "${WORKSPACE}/bin/"
 
-    aceContainer(groovyContainer, groovyOpts, [:]) {
-      sh 'groovy -classpath src/:vars/:test/ test/AllTestsRunner.groovy'
-    }
+    parallel(
+      unit: {
+        def groovyContainer = 'groovy:alpine'
+        def groovyOpts = ["--entrypoint=''"]
+
+        aceContainer(groovyContainer, groovyOpts, [:]) {
+          sh 'groovy -classpath src/:vars/:test/ test/AllTestsRunner.groovy'
+        }
+      },
+      e2e: {
+        clusterName = "ace-e2e-${env.BUILD_NUMBER}"
+        kubeConfig = "${env.WORKSPACE}/.kube-${clusterName}"
+
+        // Initialize a "kind" cluster, download it's config and then launch a sample app.
+        docker.image("alpine").inside() {
+          sh """
+          mkdir ${binPath}
+
+          wget -O ${binPath}/kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
+          chmod +x ${binPath}/kind
+
+          wget -O docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-18.06.3-ce.tgz
+          tar xvf docker.tgz
+          cp docker/docker ${binPath}
+          """
+        }
+
+        sh """
+        export PATH=${binPath}
+
+        kind create cluster --name ${clusterName}
+        docker exec -t ${clusterName}-control-plane cat /etc/kubernetes/admin.conf > ${kubeConfig}
+        """
+
+        docker.image("evryace/helm-kubectl-terraform:2.14.1__1.13.5__0.12.2").inside() {
+          sh """
+          export KUBECONFIG=${kubeConfig}
+          kubectl get pod
+          """
+        }
+
+        // docker.image("bsycorp/kind:v1.13.8").wihtRun("--privileged -p 10080:10080 -p 8443:8443") { c ->
+        //   docker.inside("alpine") {
+        //     sh """
+        //     i=0
+        //     while True; do
+        //       status=`curl -s -o ${env.WORKSPACE}/.kube -I -w "%{http_code}" http://localhost:10080/config`
+        //       [ "\$status" == "200" ] && break
+
+        //       sleep 1
+        //       [ \$i -ge 10 ] && exit 1
+        //       ((i++))
+        //     done
+        //     """
+        //   }
+
+
+      }
+    )
   }
 }
