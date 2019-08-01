@@ -67,8 +67,22 @@ ace([dockerSet: false]) {
           sh """
           export KUBECONFIG=${kubeConfig}
           kubectl get pod
+
+          kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/v0.1.1/deploy/crds/jenkins_v1alpha2_jenkins_crd.yaml
+          kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/v0.1.1/deploy/all-in-one-v1alpha2.yaml
+
+          sed "s#_VERSION_#${env.BRANCH_NAME}#g" jenkins-config.tpl.yaml > jenkins-config.yaml
+          kubectl apply -f jenkins-config.yaml
+
+          kubectl apply -f jenkins.yaml
           """
         }
+
+        sh """
+        export PATH=${binPath}
+        echo "Cleaning up temporary cluster."
+        kind delete cluster --name ${clusterName}
+        """
 
         // docker.image("bsycorp/kind:v1.13.8").wihtRun("--privileged -p 10080:10080 -p 8443:8443") { c ->
         //   docker.inside("alpine") {

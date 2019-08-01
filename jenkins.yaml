@@ -1,0 +1,90 @@
+apiVersion: jenkins.io/v1alpha2
+kind: Jenkins
+metadata:
+  name: jenkins
+  namespace: default
+spec:
+  backup:
+    action:
+      exec:
+        command:
+        - /home/user/bin/backup.sh # this command is invoked on "backup" container to make backup, for example /home/user/bin/backup.sh <backup_number>, <backup_number> is passed by operator
+        # - echo
+    containerName: backup # container name is responsible for backup
+    interval: 30 # how often make backup in seconds
+    makeBackupBeforePodDeletion: no # make backup before pod deletion
+  master:
+    containers:
+      - name: jenkins-master
+        image: jenkins/jenkins:lts
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /login
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 160
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /login
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 80
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 1
+            memory: 4Gi
+          requests:
+            cpu: 1
+            memory: 4Gi
+      - name: backup # container responsible for backup and restore
+        env:
+        - name: BACKUP_DIR
+          value: /backup
+        - name: JENKINS_HOME
+          value: /jenkins-home
+        image: virtuslab/jenkins-operator-backup-pvc:v0.0.2 # look at backup/pvc directory
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /jenkins-home # Jenkins home volume
+          name: jenkins-home
+        - mountPath: /backup # backup volume
+          name: backup
+    volumes:
+    - name: backup # PVC volume where backups will be stored
+      persistentVolumeClaim:
+        claimName: jenkins-backup-new
+
+    plugins:
+      - name: simple-theme-plugin
+        version: 0.5.1
+      - name: ws-cleanup
+        version: "0.37"
+      - name: pipeline-utility-steps
+        version: 2.3.0
+      - name: slack
+        version: "2.27"
+
+  restore:
+    action:
+      exec:
+        command:
+        - /home/user/bin/restore.sh # this command is invoked on "backup" container to make restore backup, for example /home/user/bin/restore.sh <backup_number>, <backup_number> is passed by operator
+    containerName: backup # container name is responsible for restore backup
+    #recoveryOnce: <backup_number> # if want to restore specific backup configure this field and then Jenkins will be restarted and desired backup will be restored
+  seedJobs:
+  - id: eae-marketplace-api
+    targets: "cicd/jobs/*.jenkins"
+    description: "EAE - Marketplace API"
+    credentialType: usernamePassword
+    credentialID: ghe-evry
+    repositoryBranch: master
+    repositoryUrl: https://git.evry.cloud/ILS/eae-marketplace-api.git

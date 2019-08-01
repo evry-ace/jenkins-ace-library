@@ -1,0 +1,72 @@
+apiVersion: v1
+data:
+  1-configure-theme.groovy: |2
+
+    import jenkins.*
+    import jenkins.model.*
+    import hudson.*
+    import hudson.model.*
+    import org.jenkinsci.plugins.simpletheme.ThemeElement
+    import org.jenkinsci.plugins.simpletheme.CssTextThemeElement
+    import org.jenkinsci.plugins.simpletheme.CssUrlThemeElement
+
+    Jenkins jenkins = Jenkins.getInstance()
+
+    def decorator = Jenkins.instance.getDescriptorByType(org.codefirst.SimpleThemeDecorator.class)
+
+    List<ThemeElement> configElements = new ArrayList<>();
+    configElements.add(new CssTextThemeElement("DEFAULT"));
+    configElements.add(new CssUrlThemeElement("https://cdn.rawgit.com/afonsof/jenkins-material-theme/gh-pages/dist/material-light-green.css"));
+    decorator.setElements(configElements);
+    decorator.save();
+
+    jenkins.save()
+
+  2-configure-global-lib.groovy: |2
+    import jenkins.model.Jenkins
+    import jenkins.plugins.git.GitSCMSource
+    import jenkins.plugins.git.traits.BranchDiscoveryTrait
+    import org.jenkinsci.plugins.workflow.libs.GlobalLibraries
+    import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration
+    import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever
+
+    List libraries = [] as ArrayList
+
+    def remote = 'https://github.com/evry-ace/jenkins-ace-library'
+    def credentialsId = null
+
+    name = 'ace'
+    defaultVersion = _VERSION_
+
+    if (remote != null) {
+
+        def scm = new GitSCMSource(remote)
+        if (credentialsId != null) {
+            scm.credentialsId = credentialsId
+        }
+
+        scm.traits = [new BranchDiscoveryTrait()]
+        def retriever = new SCMSourceRetriever(scm)
+
+        def library = new LibraryConfiguration(name, retriever)
+        library.defaultVersion = defaultVersion
+        library.implicit = false
+        library.allowVersionOverride = true
+        library.includeInChangesets = false
+
+        libraries << library
+
+        def global_settings = Jenkins.instance.getExtensionList(GlobalLibraries.class)[0]
+        global_settings.libraries = libraries
+        global_settings.save()
+        println 'Configured Pipeline Global Shared Libraries:\n    ' + global_settings.libraries.collect { it.name }.join('\n    ')
+    }
+
+kind: ConfigMap
+metadata:
+  labels:
+    app: jenkins-operator
+    jenkins-cr: jenkins
+    watch: "true"
+  name: jenkins-operator-user-configuration-jenkins
+  namespace: default
