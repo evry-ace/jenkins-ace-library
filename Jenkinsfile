@@ -73,7 +73,7 @@ ace([dockerSet: false]) {
 
           sed "s#_VERSION_#${env.BRANCH_NAME}#g" jenkins-config.tpl.yaml > jenkins-config.yaml
           kubectl apply -f jenkins-config.yaml
-
+          kubectl apply -f jenkins-backup-pvc.yaml
           kubectl apply -f jenkins.yaml
           """
         }
