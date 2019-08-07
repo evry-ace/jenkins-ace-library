@@ -56,8 +56,8 @@ void call(Map options = [:], Object body) {
   String shouldCleanup = options.shouldCleanup ?: true
 
   Map containers = options.containers ?: [
-    helm: 'lachlanevenson/k8s-kubectl:v1.12.7',
-    kubectl: 'lachlanevenson/k8s-helm:v2.13.1',
+    kubectl: 'lachlanevenson/k8s-kubectl:v1.12.7',
+    helm: 'lachlanevenson/k8s-helm:v2.13.1',
     terraform: 'ngeor/az-helm-kubectl-terraform:2.12.3__1.12.6__0.11.13',
   ]
 
