@@ -5,7 +5,7 @@ import java.time.ZonedDateTime
  */
 String call(Map opts = [:]) {
   String version = opts.version ?: '0.0.0'
-  String commit = gitCommitHash()
+  String commit = gitCommit()
 
-  return "${version}-${commit[0..10]}"
+  return "${version}-${commit}"
 }
