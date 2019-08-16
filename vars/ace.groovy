@@ -114,6 +114,16 @@ void call(Map options = [:], Object body) {
 
             aceDeploy(body.ace, envName, aOpts)
           }
+
+          body.kaniko = { opts = [:] ->
+            opts.registry = opts.registry ?: ace.helm.registry
+
+            String namePart = body.ace.helm.image.split(':')
+            opts.name = opts.name ?: namePart[0]
+            opts.tag = opts.tag ?: buildTag()
+
+            kanikoBuild(opts)
+          }
         }
 
         body()
