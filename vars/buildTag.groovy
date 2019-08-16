@@ -1,5 +1,3 @@
-import java.time.ZonedDateTime
-
 /**
  * getBuildTag generates a build tag using version, date, and short git hash.
  */
