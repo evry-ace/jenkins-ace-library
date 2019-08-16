@@ -116,7 +116,7 @@ void call(Map options = [:], Object body) {
           }
 
           body.kaniko = { opts = [:] ->
-            opts.registry = opts.registry ?: ace.helm.registry
+            opts.registry = opts.registry ?: body.ace.helm.registry
 
             String namePart = body.ace.helm.image.split(':')
             opts.name = opts.name ?: namePart[0]
