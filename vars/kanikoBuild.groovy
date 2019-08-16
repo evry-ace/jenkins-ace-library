@@ -2,12 +2,12 @@ def call(Map opts = [:]) {
   String registry = opts.registry
 
   String name = opts.name
-  String tag = opts.tag :? 'latest'
+  String tag = opts.tag ?: 'latest'
 
   String imageName = "${registry}/${name}:${tag}"
 
-  String context = opts.context :? '.'
-  String dockerFile = opts.dockerFile :? 'Dockerfile'
+  String context = opts.context ?: '.'
+  String dockerFile = opts.dockerFile ?: 'Dockerfile'
 
   println "[ace] Building container with Kaniko"
   println "[ace] Container ${imageName}"
