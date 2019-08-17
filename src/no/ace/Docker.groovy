@@ -36,10 +36,6 @@ class Docker implements Serializable {
     return scrub(this.script.env.BRANCH_NAME)
   }
 
-  /*String buildTag() {
-    return "${scrub(this.script.env.BRANCH_NAME)}-${this.script.env.BUILD_NUMBER}"
-  }*/
-
   String buildTag() {
     return "${scrub(this.script.env.GIT_COMMIT)}"
   }
