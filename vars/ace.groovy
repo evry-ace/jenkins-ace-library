@@ -120,7 +120,7 @@ void call(Map options = [:], Object body) {
 
             String namePart = body.ace.helm.image.split(':')
             opts.name = opts.name ?: namePart[0]
-            opts.tag = opts.tag ?: buildTag()
+            opts.tag = opts.tag ?: namePart[1]
 
             kanikoBuild(opts)
           }
