@@ -41,9 +41,9 @@ class Docker implements Serializable {
   String buildTag() {
     if (this.useBranchForTag) {
       return "${scrub(this.script.env.BRANCH_NAME)}-${this.script.env.BUILD_NUMBER}"
-    } else {
-      return script.sh(script: 'git rev-parse --short HEAD', returnStdout: true)
     }
+
+    return script.sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
   }
 
   String scrub(String str) {
