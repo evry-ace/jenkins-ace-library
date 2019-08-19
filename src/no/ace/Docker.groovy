@@ -42,7 +42,7 @@ class Docker implements Serializable {
     if (this.useBranchForTag) {
       return "${scrub(this.script.env.BRANCH_NAME)}-${this.script.env.BUILD_NUMBER}"
     } else {
-      return script.sh script: 'git show -s --pretty=%an', returnStdout: true
+      return script.sh(script: 'git show -s --pretty=%an', returnStdout: true)
     }
   }
 
