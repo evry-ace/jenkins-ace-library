@@ -27,7 +27,7 @@ void call(Map config, String envName, Map opts = [:]) {
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
   String helmValuesFile = '.ace/values.yaml'
 
-  String extraParams = opts.extraParams ?: ""
+  String extraParams = opts.extraParams ?: ''
 
   println "[ace] Got containers ${containers}"
 
