@@ -54,7 +54,7 @@ void call(Map options = [:], Object body) {
   Boolean aceInit = options.containsKey('aceInit') ? options.aceInit : true
   String aceFile = options.aceFile ?: 'ace.yaml'
   String shouldCleanup = options.shouldCleanup ?: true
-  Boolean omitStartupNotification = options.containsKey('omitStartupNotification') ? true : false
+  Boolean omitStartupNotification = options.containsKey('omitStartupNotification') ? options.omitStartupNotification : false
 
   Map containers = options.containers ?: [
     kubectl: 'lachlanevenson/k8s-kubectl:v1.12.7',
