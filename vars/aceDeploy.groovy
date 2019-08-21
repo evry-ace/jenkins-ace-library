@@ -62,7 +62,6 @@ void call(Map config, String envName, Map opts = [:]) {
       ].join('/')
 
       ace.helm.values.image.pullSecrets = ace.helm.values.image.pullSecrets ?: []
-      ace.helm.values.image.pullSecrets.push(ace.helm.registry)
     }
   }
 
