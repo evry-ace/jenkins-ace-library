@@ -85,7 +85,7 @@ void call(Map config, String envName, Map opts = [:]) {
   println "[ace] Values are: ${readFile helmValuesFile}"
 
   String credId = opts.k8sConfigCredId ?: ace.helm.cluster
-  Map credsOpts = [k8sConfigCredIt: credId]
+  Map credsOpts = [k8sConfigCredId: credId]
 
   credsWrap(credsOpts) {
     // Get Helm Version
