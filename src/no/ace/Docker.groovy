@@ -5,12 +5,14 @@ class Docker implements Serializable {
   Object script
   Map opts
   Boolean nameOnly
+  Boolean useBranchForTag
 
   Docker(Object script, Map opts = [:]) {
     this.script = script
     this.opts = opts
 
     this.nameOnly = opts.nameOnly ?: false
+    this.useBranchForTag = opts.useBranchForTag ?: false
   }
 
   String imageName() {
@@ -37,7 +39,11 @@ class Docker implements Serializable {
   }
 
   String buildTag() {
-    return "${scrub(this.script.env.BRANCH_NAME)}-${this.script.env.BUILD_NUMBER}"
+    if (this.useBranchForTag) {
+      return "${scrub(this.script.env.BRANCH_NAME)}-${this.script.env.BUILD_NUMBER}"
+    }
+
+    return script.sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
   }
 
   String scrub(String str) {
