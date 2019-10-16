@@ -113,7 +113,9 @@ void call(Map config, String envName, Map opts = [:]) {
         export HELM_HOME=\$(pwd)
 
         # Install Helm locally
-        helm init -c
+        [ "\$(helm version -c | grep 'v2\\.')" ] && {
+          helm init -c
+        }
 
         # Check Helm connection
         helm version
