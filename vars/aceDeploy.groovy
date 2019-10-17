@@ -71,6 +71,7 @@ void call(Map config, String envName, Map opts = [:]) {
   String helmRepoName = ace.helm.repoName
   String helmChart = ace.helm.chart
   String helmChartVersion = ace.helm.version
+  String helmDiscoverVersion = opts.helmDiscoverVersion ?: true
 
   println "[ace] Writing values '${ace.helm.values}' -> ${helmValuesFile}"
 
@@ -90,14 +91,16 @@ void call(Map config, String envName, Map opts = [:]) {
   credsWrap(credsOpts) {
     // Get Helm Version
     // @TODO this will not work properly due to the image name
-    aceContainer(kubectlContainer, kubectlOpts, [:]) {
-      script = '''
-        kubectl get pod -n kube-system -l app=helm,name=tiller \
-          -o jsonpath="{ .items[0].spec.containers[0].image }" | cut -d ':' -f2
-      '''
-      helmVersion = sh(script: script, returnStdout: true)?.trim()
+    if (!opts.containers.helm) {
+      aceContainer(kubectlContainer, kubectlOpts, [:]) {
+        script = '''
+          kubectl get pod -n kube-system -l app=helm,name=tiller \
+            -o jsonpath="{ .items[0].spec.containers[0].image }" | cut -d ':' -f2
+        '''
+        helmVersion = sh(script: script, returnStdout: true)?.trim()
 
-      println "[ace] Helm version discovered: ${helmVersion}"
+        println "[ace] Helm version discovered: ${helmVersion}"
+      }
     }
 
     // Deploy Helm Release
