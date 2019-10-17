@@ -113,7 +113,10 @@ void call(Map config, String envName, Map opts = [:]) {
         env
 
         # Set Helm Home
-        export HELM_HOME=\$(pwd)
+        export HELM_HOME=\$(pwd)/helm
+        export XDG_CACHE_HOME=\$HELM_HOME/cache
+        export XDG_CONFIG_HOME=\$HELM_HOME/config
+        export XDG_data_HOME=\$HELM_HOME/data
 
         # Install Helm locally
         [ "\$(helm version -c | grep 'v2\\.')" ] && {
@@ -137,6 +140,9 @@ void call(Map config, String envName, Map opts = [:]) {
 
           # Set Helm Home
           export HELM_HOME=\$(pwd)
+          export XDG_CACHE_HOME=\$HELM_HOME/cache
+          export XDG_CONFIG_HOME=\$HELM_HOME/config
+          export XDG_data_HOME=\$HELM_HOME/data
 
           # Add Helm repository
           helm repo add ${helmRepoName} ${helmRepo}
