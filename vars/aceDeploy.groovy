@@ -106,33 +106,45 @@ void call(Map config, String envName, Map opts = [:]) {
     // Deploy Helm Release
     // @TODO this will not work properly due to the image name
     aceContainer(helmContainer, helmOpts, [:]) {
-      sh """
-        set -u
-        set -e
+      script = 'helm version -c 2>&1 | grep "v2\\." > .ace/helmver'
+      sh(script: script, returnStatus: true)
+      thisHelmVersion = readFile(".ace/helmver")
 
-        env
+      Boolean helmIsV3 = thisHelmVersion == "" ? true : false
+      helmIsV3Str = helmIsV3.toString()
+      if (helmIsV3) {
+        print "[ace] Hurray, Helm 3 detected!"
+      } else {
+        sh """
+          set -u
+          set -e
 
-        # Set Helm Home
-        export HELM_HOME=\$(pwd)/helm
-        export XDG_CACHE_HOME=\$HELM_HOME/cache
-        export XDG_CONFIG_HOME=\$HELM_HOME/config
-        export XDG_data_HOME=\$HELM_HOME/data
+          env
 
-        # Install Helm locally
-        [ "\$(helm version -c | grep 'v2\\.')" ] && {
-          helm init -c
-        }
+          # Set Helm Home
+          export HELM_HOME=\$(pwd)/helm
+          export XDG_CACHE_HOME=\$HELM_HOME/cache
+          export XDG_CONFIG_HOME=\$HELM_HOME/config
+          export XDG_data_HOME=\$HELM_HOME/data
 
-        # Check Helm connection
-        helm version
-      """
+          # Install Helm locally and check connection if v2
+          [ "${helmIsV3Str}" == "false" ] && {
+            helm init -c
+            helm version -s
+          }
+        """
+      }
 
       // Check if release exists already. This is due to a suddle bug in Helm
       // where a failed first deploy (release) will prevent any further release
       // for the same release name. We have solved this by purging the failed
       // release if we detect a failure.
-      Boolean helmExists = sh(script: "helm history ${helmName}", returnStatus: true) == 0
+      println "[ace] Looking for previous histories."
+      existsArgs = helmIsV3 ? ["--namespace", "${helmNamespace}"] : []
+      Boolean helmExists = sh(script: "helm history ${existsArgs.join(' ')} ${helmName}", returnStatus: true) == 0
+      println "[ace] Release exists: ${helmExists}."
 
+      timeoutAsStr = helmIsV3 ? "${timeout}s" : "${timeout}"
       try {
         sh """
           set -u
@@ -154,7 +166,7 @@ void call(Map config, String envName, Map opts = [:]) {
             --debug=${debug} \
             --dry-run=${dryrun} \
             --wait=${wait} \
-            --timeout=${timeout} \
+            --timeout=${timeoutAsStr} \
             --version=${helmChartVersion} \
             ${extraParams} \
             ${helmName} \
@@ -163,7 +175,17 @@ void call(Map config, String envName, Map opts = [:]) {
       } catch (err) {
         if (!helmExists && !dryrun) {
           try {
-            sh(script: "helm delete ${helmName} --purge", returnStatus: true)
+            String deleteArgs = [
+              helmName,
+            ]
+
+            if (helmIsV3) {
+              deleteArgs = deleteArgs + ["--namespace=${helmNamespace}"]
+            } else {
+              deleteArgs.add('--purge')
+            }
+
+            sh(script: "helm delete ${deleteArgs.join(' ')}" , returnStatus: true)
           } catch (e) {
             println '[ace] Helm purge failed'
             println "[ace] ${e}"
