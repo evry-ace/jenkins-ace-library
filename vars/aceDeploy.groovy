@@ -71,7 +71,7 @@ void call(Map config, String envName, Map opts = [:]) {
   String helmRepoName = ace.helm.repoName
   String helmChart = ace.helm.chart
   String helmChartVersion = ace.helm.version
-  String helmDiscoverVersion = opts.helmDiscoverVersion ?: true
+  // String helmDiscoverVersion = opts.helmDiscoverVersion ?: true
 
   println "[ace] Writing values '${ace.helm.values}' -> ${helmValuesFile}"
 
@@ -108,12 +108,12 @@ void call(Map config, String envName, Map opts = [:]) {
     aceContainer(helmContainer, helmOpts, [:]) {
       script = 'helm version -c 2>&1 | grep "v2\\." > .ace/helmver'
       sh(script: script, returnStatus: true)
-      thisHelmVersion = readFile(".ace/helmver")
+      String thisHelmVersion = readFile('.ace/helmver')
 
-      Boolean helmIsV3 = thisHelmVersion == "" ? true : false
+      Boolean helmIsV3 = thisHelmVersion == ''
       helmIsV3Str = helmIsV3.toString()
       if (helmIsV3) {
-        print "[ace] Hurray, Helm 3 detected!"
+        print '[ace] Hurray, Helm 3 detected!'
       } else {
         sh """
           set -u
@@ -139,9 +139,13 @@ void call(Map config, String envName, Map opts = [:]) {
       // where a failed first deploy (release) will prevent any further release
       // for the same release name. We have solved this by purging the failed
       // release if we detect a failure.
-      println "[ace] Looking for previous histories."
-      existsArgs = helmIsV3 ? ["--namespace", "${helmNamespace}"] : []
-      Boolean helmExists = sh(script: "helm history ${existsArgs.join(' ')} ${helmName}", returnStatus: true) == 0
+      println '[ace] Looking for previous histories.'
+      existsArgs = helmIsV3 ? ['--namespace', "${helmNamespace}"] : []
+      Int helmExistsStatus = sh(
+        script: "helm history ${existsArgs.join(' ')} ${helmName}",
+        returnStatus: true
+      )
+      Boolean helmExists = helmExistsStatus == 0
       println "[ace] Release exists: ${helmExists}."
 
       timeoutAsStr = helmIsV3 ? "${timeout}s" : "${timeout}"
