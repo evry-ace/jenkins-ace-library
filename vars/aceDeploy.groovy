@@ -141,7 +141,7 @@ void call(Map config, String envName, Map opts = [:]) {
       // release if we detect a failure.
       println '[ace] Looking for previous histories.'
       existsArgs = helmIsV3 ? ['--namespace', "${helmNamespace}"] : []
-      Int helmExistsStatus = sh(
+      Integer helmExistsStatus = sh(
         script: "helm history ${existsArgs.join(' ')} ${helmName}",
         returnStatus: true
       )
