@@ -58,10 +58,17 @@ void call(Map options = [:], Object body) {
     'allowStartupNotification') ? options.allowStartupNotification : true
 
   Map containers = options.containers ?: [
+<<<<<<< HEAD
     kubectl: 'lachlanevenson/k8s-kubectl:v1.12.7',
     helm: 'lachlanevenson/k8s-helm:v2.13.1',
     terraform: 'ngeor/az-helm-kubectl-terraform:2.12.3__1.12.6__0.11.13',
     twistcli: 'evryace/twistcli:1',
+=======
+    kubectl: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
+    helm: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
+    terraform: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
+    ace: 'evryace/ace-2-values:14',
+>>>>>>> Add utilities for gitops flow.
   ]
 
   node(buildAgent) {
@@ -140,6 +147,71 @@ void call(Map options = [:], Object body) {
             String image = "${aOpts.registry}/${namePart[0]}:${namePart[1]}"
 
             twistcliScanImage(image, aOpts)
+          }
+
+          body.generateValues = { opts = [:] ->
+            aOpts = opts ?: [:]
+            aOpts.containers = aOpts.containers ?: containers
+            aOpts.image = body.ace.helm.image
+
+            generateAceValues(aOpts)
+          }
+
+          body.pushConfigToGit = { opts = [:] ->
+            aOpts = opts ?: [:]
+            aOpts.containers = aOpts.containers ?: containers
+            aOpts.image = body.ace.helm.image
+
+            String tag = body.ace.helm.image.split(':')[1]
+
+            generateAceValues(aOpts)
+
+            target = readYaml file: 'target-data/target.yaml'
+            cfg = readYaml file: 'ace.yaml'
+            target.gitops = cfg.gitops
+
+            helmPullChart(target.chart, aOpts)
+
+            withCredentials([usernamePassword(
+              credentialsId: 'jenkins-git',
+              usernameVariable: 'GIT_USER',
+              passwordVariable: 'GIT_TOKEN')]
+            ) {
+              String origin = target.gitops.replace(
+                'https://', "https://${GIT_USER}:${GIT_TOKEN}@"
+              )
+
+              sh """
+              set -e
+              set -u
+
+              git config --global user.email jenkins@tietoevry.com
+              git config --global user.name "Jenkins the autonomous"
+
+              git clone ${origin} gitops
+              cd gitops
+              git checkout test
+
+              CHANGED=''
+              [ ! -d "${target.name}" ] && {
+                cp -R ../target-data ${target.name}
+                CHANGED=y
+              } || {
+                [ ! -z "`diff -Naur ../target-data ${target.name}`" ] && {
+                  CHANGED=y
+                  rm -rf ${target.name}
+                  cp -R ../target-data ${target.name}
+                }
+              }
+
+              if [ ! -z "\$CHANGED" ]; then
+                git add .
+                git commit -m "Update from build - ${tag}"
+
+                git push origin test
+              fi
+              """
+            }
           }
         }
 

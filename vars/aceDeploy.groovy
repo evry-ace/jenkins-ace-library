@@ -17,8 +17,6 @@ void call(Map config, String envName, Map opts = [:]) {
   Boolean wait = opts.containsKey('wait') ? opts.wait : true
   Integer timeout = opts.timeout ?: 600
 
-  Boolean dockerSet = opts.containsKey('dockerSet') ? opts.dockerSet : true
-
   Map containers = opts.containers ?: [:]
   String kubectlContainer = containers.kubectl ?: ''
   List<String> kubectlOpts = opts.kubectlOpts ?: ["--entrypoint=''"]
@@ -30,13 +28,11 @@ void call(Map config, String envName, Map opts = [:]) {
   String extraParams = opts.extraParams ?: ''
 
   println "[ace] Got containers ${containers}"
-
   println "[ace] Job name: ${env.JOB_NAME}"
 
   def (String org, String jobName, String branch) = getParts(env.JOB_NAME)
   println "[ace] org=${org}, repo=${jobName}, branch=${branch}"
 
-  // @TODO this logic could be moved to the Config Class
   config.name = config.name ?: jobName
 
   Map ace = Config.parse(config, envName)
@@ -46,24 +42,7 @@ void call(Map config, String envName, Map opts = [:]) {
   println "[ace] Name: ${config.name}"
   println '[ace] Configuration done.'
 
-  if (dockerSet) {
-    ace.helm.values.image = ace.helm.values.image ?: [:]
-
-    if (ace.helm.image) {
-      def (String repository, String tag) = ace.helm.image.split(':')
-      ace.helm.values.image.repository = repository
-      ace.helm.values.image.tag = tag
-    }
-
-    if (ace.helm.registry) {
-      ace.helm.values.image.repository = [
-        ace.helm.registry,
-        ace.helm.values.image.repository,
-      ].join('/')
-
-      ace.helm.values.image.pullSecrets = ace.helm.values.image.pullSecrets ?: []
-    }
-  }
+  // @TODO this logic could be moved to the Config Class
 
   String helmName = ace.helm.name
   String helmNamespace = ace.helm.namespace
@@ -149,6 +128,13 @@ void call(Map config, String envName, Map opts = [:]) {
       println "[ace] Release exists: ${helmExists}."
 
       timeoutAsStr = helmIsV3 ? "${timeout}s" : "${timeout}"
+
+      if (helmIsV3) {
+        extraParams = '--set '
+      } else {
+        extraParams = "${extraParams}"
+      }
+
       try {
         sh """
           set -u
