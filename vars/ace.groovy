@@ -139,7 +139,7 @@ void call(Map options = [:], Object body) {
             List<String> namePart = body.ace.helm.image.split(':')
             String image = "${aOpts.registry}/${namePart[0]}:${namePart[1]}"
 
-            twistlockScanImage(image, aOpts)
+            twistcliScanImage(image, aOpts)
           }
         }
 
