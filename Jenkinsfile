@@ -1,5 +1,5 @@
 #!groovy
-@Library("ace@container-poc") _
+@Library("ace") _
 
 ace([dockerSet: false]) {
   stage('Lint') {
