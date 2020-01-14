@@ -45,7 +45,7 @@ Object setupNotifier(Object body) {
   return chat
 }
 
-@SuppressWarnings(['MethodSize', 'CyclomaticComplexity'])
+@SuppressWarnings(['MethodSize', 'CyclomaticComplexity', 'UnnecessaryObjectReferences'])
 void call(Map options = [:], Object body) {
   Boolean debug = options.containsKey('debug') ? options.debug : true
   String workspace = options.workspace ?: '/home/jenkins/workspace'
@@ -58,17 +58,10 @@ void call(Map options = [:], Object body) {
     'allowStartupNotification') ? options.allowStartupNotification : true
 
   Map containers = options.containers ?: [
-<<<<<<< HEAD
-    kubectl: 'lachlanevenson/k8s-kubectl:v1.12.7',
-    helm: 'lachlanevenson/k8s-helm:v2.13.1',
-    terraform: 'ngeor/az-helm-kubectl-terraform:2.12.3__1.12.6__0.11.13',
-    twistcli: 'evryace/twistcli:1',
-=======
     kubectl: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
     helm: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
     terraform: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
     ace: 'evryace/ace-2-values:14',
->>>>>>> Add utilities for gitops flow.
   ]
 
   node(buildAgent) {
