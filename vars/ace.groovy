@@ -61,6 +61,7 @@ void call(Map options = [:], Object body) {
     kubectl: 'lachlanevenson/k8s-kubectl:v1.12.7',
     helm: 'lachlanevenson/k8s-helm:v2.13.1',
     terraform: 'ngeor/az-helm-kubectl-terraform:2.12.3__1.12.6__0.11.13',
+    twistcli: 'evryace/twistcli:1',
   ]
 
   node(buildAgent) {
@@ -128,6 +129,17 @@ void call(Map options = [:], Object body) {
             opts.tag = opts.tag ?: namePart[1]
 
             kanikoBuild(opts)
+          }
+
+          body.scanWithTwistlock = { opts = [:] ->
+            aOpts = opts ?: [:]
+            aOpts.containers = aOpts.containers ?: containers
+            aOpts.registry = aOpts.registry ?: body.ace.helm.registry
+
+            List<String> namePart = body.ace.helm.image.split(':')
+            String image = "${aOpts.registry}/${namePart[0]}:${namePart[1]}"
+
+            twistlockScanImage(image, aOpts)
           }
         }
 
