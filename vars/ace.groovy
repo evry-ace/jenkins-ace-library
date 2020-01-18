@@ -156,10 +156,8 @@ void call(Map options = [:], Object body) {
           body.scanWithTwistlock = { opts = [:] ->
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
-            aOpts.registry = aOpts.registry ?: body.ace.helm.registry
 
-            List<String> namePart = body.ace.helm.image.split(':')
-            String image = "${aOpts.registry}/${namePart[0]}:${namePart[1]}"
+            image = "${body.ace.helm.registry}/${body.ace.helm.image}"
 
             twistcliScanImage(image, aOpts)
           }
@@ -167,7 +165,7 @@ void call(Map options = [:], Object body) {
           body.generateValues = { opts = [:] ->
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
-            aOpts.image = body.ace.helm.image
+            aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
 
             generateAceValues(aOpts)
           }
