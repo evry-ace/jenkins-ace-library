@@ -22,12 +22,12 @@ Object setupNotifier(Object body) {
 
     List<String> creds = []
     if (!notifications.startsWith('https')) {
-      println("Teams using secret: ${alerts} for notifications")
+      println("[ace] Teams using secret: ${alerts} for notifications")
       creds.add(string(credentialsId: notifications, variable: 'TEAMS_NOTIFY_URL'))
     }
 
     if (!alerts.startsWith('https')) {
-      println("Teams using secret: ${alerts} for alerts")
+      println("[ace] Teams using secret: ${alerts} for alerts")
       creds.add(string(credentialsId: alerts, variable: 'TEAMS_ALERT_URL'))
     }
 
@@ -35,7 +35,7 @@ Object setupNotifier(Object body) {
       String notifyUrl = env.TEAMS_NOTIFY_URL ?: notifications
       String alertUrl = env.TEAMS_ALERT_URL ?: alerts
 
-      println("Teams webhook url lengths: ${notifyUrl.length()} ${alertUrl.length()}")
+      println("[ace] Teams webhook url lengths: ${notifyUrl.length()} ${alertUrl.length()}")
       chat = new Teams(body, notifyUrl, alertUrl)
     }
   } else {
@@ -53,21 +53,43 @@ void call(Map options = [:], Object body) {
   Boolean dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
   Boolean aceInit = options.containsKey('aceInit') ? options.aceInit : true
   String aceFile = options.aceFile ?: 'ace.yaml'
-  String shouldCleanup = options.shouldCleanup ?: true
-  Boolean allowStartupNotification = options.containsKey(
-    'allowStartupNotification') ? options.allowStartupNotification : true
 
-  Map containers = options.containers ?: [
-    kubectl: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
-    helm: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
-    terraform: 'evryace/helm-kubectl-terraform:v3.0.1__v1.13.10__0.12.18',
-    ace: 'evryace/ace-2-values:14',
-  ]
+  // Don't care anymore about jobs starting, it's more annoying then good.
+  Boolean allowStartupNotification = options.allowStartupNotification ?: false
+  Boolean shouldCleanup = options.shouldCleanup ?: true
 
   node(buildAgent) {
+    Map containers = [:]
+    if (hasDocker()) {
+      /*
+        This is when we run on a docker enabled worker, then we specify images we want
+        vs containers
+      */
+      containers = defaultContainers()
+    } else {
+      // This needs to match the podTemplate you specify
+      containers = [
+        helm: 'cd',
+        kubectl: 'cd',
+        terraform: 'cd',
+        twistcli: 'twistcli',
+        ace: 'ace',
+      ]
+
+      /*
+        Workspace cleanup is actually only needed when on a jenkins node, when in k8s the workspaces
+        are ephemeral.
+      */
+      shouldCleanup = false
+    }
+
+    if (options.containers) {
+      containers << options.containers
+    }
+
     buildWorkspace([workspace: workspace]) {
       try {
-        println 'Dedicated to the original ACE, by Alan Turing'
+        println '[ace] Dedicated to the original ACE, by Alan Turing'
 
         checkout scm
 

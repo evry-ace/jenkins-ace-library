@@ -71,7 +71,7 @@ void call(Map config, String envName, Map opts = [:]) {
     // Get Helm Version
     // @TODO this will not work properly due to the image name
     if (!opts.containers.helm) {
-      aceContainer(kubectlContainer, kubectlOpts, [:]) {
+      aceContainerWrapper(kubectlContainer, kubectlOpts, [:]) {
         script = '''
           kubectl get pod -n kube-system -l app=helm,name=tiller \
             -o jsonpath="{ .items[0].spec.containers[0].image }" | cut -d ':' -f2
@@ -84,7 +84,7 @@ void call(Map config, String envName, Map opts = [:]) {
 
     // Deploy Helm Release
     // @TODO this will not work properly due to the image name
-    aceContainer(helmContainer, helmOpts, [:]) {
+    aceContainerWrapper(helmContainer, helmOpts, [:]) {
       script = 'helm version -c 2>&1 | grep "v2\\." > .ace/helmver'
       sh(script: script, returnStatus: true)
       String thisHelmVersion = readFile('.ace/helmver')

@@ -30,7 +30,7 @@ ace([dockerSet: false]) {
     def groovyContainer = 'groovy:alpine'
     def groovyOpts = ["--entrypoint=''"]
 
-    aceContainer(groovyContainer, groovyOpts, [:]) {
+    aceContainerWrapper(groovyContainer, groovyOpts, [:]) {
       sh 'groovy -classpath src/:vars/:test/ test/AllTestsRunner.groovy'
     }
   }

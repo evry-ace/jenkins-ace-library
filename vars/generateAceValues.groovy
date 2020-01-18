@@ -13,7 +13,7 @@ void call(Map opts = [:]) {
   println "[ace] - Got containers - ${containers}"
   println "[ace] Will generate values & target metadata using   ${parserContainer}"
 
-  aceContainer(parserContainer, parserOpts, [:]) {
+  aceContainerWrapper(parserContainer, parserOpts, [:]) {
     println "[ace] - Got opts - ${parserOpts}"
 
     sh """
