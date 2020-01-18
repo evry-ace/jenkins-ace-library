@@ -165,6 +165,7 @@ void call(Map options = [:], Object body) {
           body.generateValues = { opts = [:] ->
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
+
             aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
 
             generateAceValues(aOpts)
@@ -173,7 +174,8 @@ void call(Map options = [:], Object body) {
           body.pushConfigToGit = { opts = [:] ->
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
-            aOpts.image = body.ace.helm.image
+
+            aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
 
             String tag = body.ace.helm.image.split(':')[1]
 
