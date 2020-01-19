@@ -142,6 +142,10 @@ void call(Map options = [:], Object body) {
             aOpts.containers = aOpts.containers ?: containers
             aOpts << [chat: body.chat, debug: debug]
 
+            aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
+
+            generateAceValues(aOpts)
+
             aceDeploy(body.ace, envName, aOpts)
           }
 

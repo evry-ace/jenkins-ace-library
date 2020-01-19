@@ -1,7 +1,5 @@
 #!/usr/bin/env groovy
 
-import no.ace.Config
-
 List<Object> getParts(String name) {
   List<String> parts = name.split('/')
   return parts.size() == 2 ? [null] + parts : parts
@@ -23,7 +21,6 @@ void call(Map config, String envName, Map opts = [:]) {
 
   String helmContainer = containers.helm ?: ''
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
-  String helmValuesFile = '.ace/values.yaml'
 
   String extraParams = opts.extraParams ?: ''
 
@@ -35,36 +32,19 @@ void call(Map config, String envName, Map opts = [:]) {
 
   config.name = config.name ?: jobName
 
-  Map ace = Config.parse(config, envName)
-  ace.helm = ace.helm ?: [:]
-  ace.helm.values = ace.helm.values ?: [:]
+  Map target = readYaml file: 'target-data/target.yaml'
+  Map targetEnv = readYaml file: "target-data/target.${envName}.yaml"
 
-  println "[ace] Name: ${config.name}"
   println '[ace] Configuration done.'
 
-  // @TODO this logic could be moved to the Config Class
-
-  String helmName = ace.helm.name
-  String helmNamespace = ace.helm.namespace
+  String helmName = target.name
+  String helmNamespace = targetEnv.namespace
   String helmRepo = ace.helm.repo
   String helmRepoName = ace.helm.repoName
-  String helmChart = ace.helm.chart
-  String helmChartVersion = ace.helm.version
-  // String helmDiscoverVersion = opts.helmDiscoverVersion ?: true
+  String helmChart = target.chart
+  String helmChartVersion = target.version
 
-  println "[ace] Writing values '${ace.helm.values}' -> ${helmValuesFile}"
-
-  Boolean valuesFileExists = fileExists(helmValuesFile)
-  if (valuesFileExists) {
-    sh "rm ${helmValuesFile}"
-  }
-
-  writeYaml file: helmValuesFile, data: ace.helm.values
-
-  println "[ace] Wrote values to ${helmValuesFile}"
-  println "[ace] Values are: ${readFile helmValuesFile}"
-
-  String credId = opts.k8sConfigCredId ?: ace.helm.cluster
+  String credId = opts.k8sConfigCredId ?: targetEnv.cluster
   Map credsOpts = [k8sConfigCredId: credId]
 
   credsWrap(credsOpts) {
@@ -148,7 +128,7 @@ void call(Map config, String envName, Map opts = [:]) {
 
           helm upgrade --install \
             --namespace ${helmNamespace} \
-            -f ${helmValuesFile} \
+            -f out/values.${envName}.yaml \
             --debug=${debug} \
             --dry-run=${dryrun} \
             --wait=${wait} \
