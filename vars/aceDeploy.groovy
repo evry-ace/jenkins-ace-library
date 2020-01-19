@@ -129,11 +129,7 @@ void call(Map config, String envName, Map opts = [:]) {
 
       timeoutAsStr = helmIsV3 ? "${timeout}s" : "${timeout}"
 
-      if (helmIsV3) {
-        extraParams = '--set '
-      } else {
-        extraParams = "${extraParams}"
-      }
+      extraParams = "${extraParams}"
 
       try {
         sh """
