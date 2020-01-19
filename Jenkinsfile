@@ -1,5 +1,5 @@
 #!groovy
-@Library("ace") _
+@Library("ace@rewrite") _
 
 ace([dockerSet: false]) {
   stage('Lint') {
