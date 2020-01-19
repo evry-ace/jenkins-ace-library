@@ -35,7 +35,8 @@ Object setupNotifier(Object body) {
       String notifyUrl = env.TEAMS_NOTIFY_URL ?: notifications
       String alertUrl = env.TEAMS_ALERT_URL ?: alerts
 
-      println("[ace] Teams webhook url lengths: ${notifyUrl.length()} ${alertUrl.length()}")
+      println('[ace] Teams webhook url lengths:' +
+        "${notifyUrl.length()} ${alertUrl.length()}")
       chat = new Teams(body, notifyUrl, alertUrl)
     }
   } else {
@@ -48,7 +49,6 @@ Object setupNotifier(Object body) {
 @SuppressWarnings(['MethodSize', 'CyclomaticComplexity', 'UnnecessaryObjectReferences'])
 void call(Map options = [:], Object body) {
   Boolean debug = options.containsKey('debug') ? options.debug : true
-  String workspace = options.workspace ?: '/home/jenkins/workspace'
   String buildAgent = options.buildAgent ?: 'jenkins-docker-3'
   Boolean dockerSet = options.containsKey('dockerSet') ? options.dockerSet : true
   Boolean aceInit = options.containsKey('aceInit') ? options.aceInit : true
@@ -57,6 +57,7 @@ void call(Map options = [:], Object body) {
   // Don't care anymore about jobs starting, it's more annoying then good.
   Boolean allowStartupNotification = options.allowStartupNotification ?: false
   Boolean shouldCleanup = options.shouldCleanup ?: true
+  String workspace
 
   node(buildAgent) {
     Map containers = [:]
@@ -66,6 +67,7 @@ void call(Map options = [:], Object body) {
         vs containers
       */
       containers = defaultContainers()
+      workspace = options.workspace ?: '/home/jenkins/workspace'
     } else {
       // This needs to match the podTemplate you specify
       containers = [
@@ -77,10 +79,11 @@ void call(Map options = [:], Object body) {
       ]
 
       /*
-        Workspace cleanup is actually only needed when on a jenkins node, when in k8s the workspaces
-        are ephemeral.
+        Workspace cleanup is actually only needed when on a jenkins node, when
+        in k8s the workspaces are ephemeral.
       */
       shouldCleanup = false
+      workspace = options.workspace ?: '/home/jenkins/agent/workspace'
     }
 
     if (options.containers) {
