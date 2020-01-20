@@ -6,7 +6,7 @@ Map call() {
     helm: cdImg,
     terraform: cdImg,
     cd: cdImg,
-    ace: 'evryace/ace-2-values:14',
+    ace: 'evryace/ace-2-values:15',
   ]
 
   return containers

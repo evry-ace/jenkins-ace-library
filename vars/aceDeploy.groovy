@@ -39,8 +39,8 @@ void call(Map config, String envName, Map opts = [:]) {
 
   String helmName = target.name
   String helmNamespace = targetEnv.namespace
-  String helmRepo = ace.helm.repo
-  String helmRepoName = ace.helm.repoName
+  String helmRepo = target.helm.repo
+  String helmRepoName = target.helm.repoName
   String helmChart = target.chart
   String helmChartVersion = target.version
 
