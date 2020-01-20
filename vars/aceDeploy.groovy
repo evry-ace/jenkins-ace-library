@@ -16,8 +16,6 @@ void call(Map config, String envName, Map opts = [:]) {
   Integer timeout = opts.timeout ?: 600
 
   Map containers = opts.containers ?: [:]
-  String kubectlContainer = containers.kubectl ?: ''
-  List<String> kubectlOpts = opts.kubectlOpts ?: ["--entrypoint=''"]
 
   String helmContainer = containers.helm ?: ''
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
@@ -48,58 +46,15 @@ void call(Map config, String envName, Map opts = [:]) {
   Map credsOpts = [k8sConfigCredId: credId]
 
   credsWrap(credsOpts) {
-    // Get Helm Version
-    // @TODO this will not work properly due to the image name
-    if (!opts.containers.helm) {
-      aceContainerWrapper(kubectlContainer, kubectlOpts, [:]) {
-        script = '''
-          kubectl get pod -n kube-system -l app=helm,name=tiller \
-            -o jsonpath="{ .items[0].spec.containers[0].image }" | cut -d ':' -f2
-        '''
-        helmVersion = sh(script: script, returnStdout: true)?.trim()
-
-        println "[ace] Helm version discovered: ${helmVersion}"
-      }
-    }
-
     // Deploy Helm Release
     // @TODO this will not work properly due to the image name
     aceContainerWrapper(helmContainer, helmOpts, [:]) {
-      script = 'helm version -c 2>&1 | grep "v2\\." > .ace/helmver'
-      sh(script: script, returnStatus: true)
-      String thisHelmVersion = readFile('.ace/helmver')
-
-      Boolean helmIsV3 = thisHelmVersion == ''
-      helmIsV3Str = helmIsV3.toString()
-      if (helmIsV3) {
-        print '[ace] Hurray, Helm 3 detected!'
-      } else {
-        sh """
-          set -u
-          set -e
-
-          env
-
-          # Set Helm Home
-          export HELM_HOME=\$(pwd)/helm
-          export XDG_CACHE_HOME=\$HELM_HOME/cache
-          export XDG_CONFIG_HOME=\$HELM_HOME/config
-          export XDG_data_HOME=\$HELM_HOME/data
-
-          # Install Helm locally and check connection if v2
-          [ "${helmIsV3Str}" == "false" ] && {
-            helm init -c
-            helm version -s
-          }
-        """
-      }
-
       // Check if release exists already. This is due to a suddle bug in Helm
       // where a failed first deploy (release) will prevent any further release
       // for the same release name. We have solved this by purging the failed
       // release if we detect a failure.
       println '[ace] Looking for previous histories.'
-      existsArgs = helmIsV3 ? ['--namespace', "${helmNamespace}"] : []
+      existsArgs = ['--namespace', "${helmNamespace}"]
       Integer helmExistsStatus = sh(
         script: "helm history ${existsArgs.join(' ')} ${helmName}",
         returnStatus: true
@@ -145,12 +100,7 @@ void call(Map config, String envName, Map opts = [:]) {
               helmName,
             ]
 
-            if (helmIsV3) {
-              deleteArgs = deleteArgs + ["--namespace=${helmNamespace}"]
-            } else {
-              deleteArgs.add('--purge')
-            }
-
+            deleteArgs = deleteArgs + ["--namespace=${helmNamespace}"]
             sh(script: "helm delete ${deleteArgs.join(' ')}" , returnStatus: true)
           } catch (e) {
             println '[ace] Helm purge failed'
