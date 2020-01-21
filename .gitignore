@@ -2,3 +2,7 @@ codenarc-output.html
 groovylint-errors.html
 .gradle
 build
+bin/
+.classpath
+.project
+.settings/

@@ -12,7 +12,7 @@ void call(String imageId, Map opts = [:]) {
     usernameVariable: 'TWISTLOCK_USER',
     passwordVariable: 'TWISTLOCK_PASSWORD')]
   ) {
-    aceContainer(twistcliContainer, twistcliOpts, [:]) {
+    aceContainerWrapper(twistcliContainer, twistcliOpts, [:]) {
       sh """
       twistcli images scan \
         --address ${consoleAddress} \
