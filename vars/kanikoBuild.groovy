@@ -27,6 +27,9 @@ void call(Map opts = [:]) {
   container(name: 'kaniko', shell: '/busybox/sh') {
     sh """
     #!/busybox/sh
+
+    export PATH=/busybox:/kaniko:$PATH
+
     mkdir -p /kaniko/.docker
     cp /kaniko/.pullsecret/.dockerconfigjson /kaniko/.docker/config.json
 
