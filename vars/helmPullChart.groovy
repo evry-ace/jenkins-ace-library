@@ -5,7 +5,7 @@ void call(String chart, Map opts = [:]) {
 
   println "[ace] - Got containers - ${containers}"
 
-  aceContainer(helmContainer, helmOpts, [:]) {
+  aceContainerWrapper(helmContainer, helmOpts, [:]) {
     sh """
       set -u
       set -e
