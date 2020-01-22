@@ -19,6 +19,7 @@ void call(String imageId, Map opts = [:]) {
         --containerized \
         --include-files \
         --include-package-files \
+        --include-js-dependencies \
         --details \
         --publish \
         --output-file scan.out \

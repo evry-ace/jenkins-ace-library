@@ -1,5 +1,5 @@
 Object call(Map opts = [:]) {
-  String image = opts.image ?: 'evryace/twistcli:1'
+  String image = opts.image ?: 'evryace/twistcli:15.11.506'
 
   return containerTemplate(
     name: 'twistcli',
