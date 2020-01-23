@@ -20,7 +20,7 @@ void call(String imageId, Map opts = [:]) {
 
       mkdir /.docker
       cp /.pullsecret/.dockerconfigjson /.docker/config.json
-      DOCKER_CONFIG=/.docker
+      export DOCKER_CONFIG=/.docker
 
       docker pull ${imageId}
 
