@@ -14,7 +14,7 @@ void call(String imageId, Map opts = [:]) {
   ) {
     aceContainerWrapper(twistcliContainer, twistcliOpts, [:]) {
       sh """
-      #!/bin/bash -ex
+      #!/bin/sh
       which docker
 
       twistcli images scan \
