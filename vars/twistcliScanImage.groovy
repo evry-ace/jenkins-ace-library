@@ -16,7 +16,6 @@ void call(String imageId, Map opts = [:]) {
       sh """
       twistcli images scan \
         --address ${consoleAddress} \
-        --containerized \
         --include-files \
         --include-package-files \
         --include-js-dependencies \
