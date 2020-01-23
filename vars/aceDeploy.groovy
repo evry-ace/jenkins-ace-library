@@ -81,7 +81,7 @@ void call(Map config, String envName, Map opts = [:]) {
 
           helm upgrade --install \
             --namespace ${helmNamespace} \
-            -f out/values.${envName}.yaml \
+            -f target-datavalues.${envName}.yaml \
             --debug=${debug} \
             --dry-run=${dryrun} \
             --wait=${wait} \
