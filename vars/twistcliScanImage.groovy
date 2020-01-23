@@ -17,10 +17,12 @@ void call(String imageId, Map opts = [:]) {
       sh """
       #!/bin/sh -x
       which docker
+
       mkdir /.docker
       cp /.pullsecret/.dockerconfigjson /.docker/config.json
+      DOCKER_CONFIG=/.docker
 
-      docker --config=/.docker pull ${imageId}
+      docker pull ${imageId}
 
       twistcli images scan \
         --address ${consoleAddress} \
