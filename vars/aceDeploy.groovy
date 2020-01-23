@@ -62,8 +62,6 @@ void call(Map config, String envName, Map opts = [:]) {
       Boolean helmExists = helmExistsStatus == 0
       println "[ace] Release exists: ${helmExists}."
 
-      timeoutAsStr = helmIsV3 ? "${timeout}s" : "${timeout}"
-
       extraParams = "${extraParams}"
 
       try {
@@ -87,7 +85,7 @@ void call(Map config, String envName, Map opts = [:]) {
             --debug=${debug} \
             --dry-run=${dryrun} \
             --wait=${wait} \
-            --timeout=${timeoutAsStr} \
+            --timeout=${timeout}s \
             --version=${helmChartVersion} \
             ${extraParams} \
             ${helmName} \
