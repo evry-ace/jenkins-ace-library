@@ -12,9 +12,10 @@ void call(String imageId, Map opts = [:]) {
     usernameVariable: 'TWISTLOCK_USER',
     passwordVariable: 'TWISTLOCK_PASSWORD')]
   ) {
+    println "[ace] Scanning image ${imageId} using console ${consoleAddress}"
     aceContainerWrapper(twistcliContainer, twistcliOpts, [:]) {
       sh """
-      #!/bin/sh
+      #!/bin/sh -x
       which docker
 
       twistcli images scan \
