@@ -62,8 +62,6 @@ void call(Map config, String envName, Map opts = [:]) {
       Boolean helmExists = helmExistsStatus == 0
       println "[ace] Release exists: ${helmExists}."
 
-      extraParams = "${extraParams}"
-
       try {
         sh """
           set -u
@@ -81,7 +79,7 @@ void call(Map config, String envName, Map opts = [:]) {
 
           helm upgrade --install \
             --namespace ${helmNamespace} \
-            -f target-datavalues.${envName}.yaml \
+            -f target-data/values.${envName}.yaml \
             --debug=${debug} \
             --dry-run=${dryrun} \
             --wait=${wait} \
@@ -94,12 +92,8 @@ void call(Map config, String envName, Map opts = [:]) {
       } catch (err) {
         if (!helmExists && !dryrun) {
           try {
-            String deleteArgs = [
-              helmName,
-            ]
-
-            deleteArgs = deleteArgs + ["--namespace=${helmNamespace}"]
-            sh(script: "helm delete ${deleteArgs.join(' ')}" , returnStatus: true)
+            String deleteArgs = "${helmName} --namespace=${helmNamespace}"
+            sh(script: "helm delete ${deleteArgs}" , returnStatus: true)
           } catch (e) {
             println '[ace] Helm purge failed'
             println "[ace] ${e}"
