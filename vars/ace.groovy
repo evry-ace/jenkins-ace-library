@@ -57,8 +57,10 @@ void call(Map options = [:], Object body) {
   // Don't care anymore about jobs starting, it's more annoying then good.
   Boolean allowStartupNotification = options.allowStartupNotification ?: false
   Boolean shouldCleanup = options.shouldCleanup ?: true
-  String workspace
 
+  String confWorkspace = env.WORKSPACE_PATH ?: opts.workspace
+
+  String workspace
   node(buildAgent) {
     Map containers = [:]
     if (hasDocker()) {
@@ -67,7 +69,7 @@ void call(Map options = [:], Object body) {
         vs containers
       */
       containers = defaultContainers()
-      workspace = options.workspace ?: '/home/jenkins/workspace'
+      workspace = confWorkspace ?: '/home/jenkins/workspace'
     } else {
       // This needs to match the podTemplate you specify
       containers = [
@@ -83,7 +85,7 @@ void call(Map options = [:], Object body) {
         in k8s the workspaces are ephemeral.
       */
       shouldCleanup = false
-      workspace = options.workspace ?: '/home/jenkins/agent/workspace'
+      workspace = confWorkspace ?: '/home/jenkins/agent/workspace'
     }
 
     if (options.containers) {
