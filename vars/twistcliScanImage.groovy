@@ -17,6 +17,7 @@ void call(String imageId, Map opts = [:]) {
       sh """
       #!/bin/sh -x
       which docker
+      docker pull ${imageId}
 
       twistcli images scan \
         --address ${consoleAddress} \
