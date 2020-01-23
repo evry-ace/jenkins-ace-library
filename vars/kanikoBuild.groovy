@@ -31,7 +31,7 @@ void call(Map opts = [:]) {
     export PATH=/busybox:/kaniko:$PATH
 
     mkdir -p /kaniko/.docker
-    cp /kaniko/.pullsecret/.dockerconfigjson /kaniko/.docker/config.json
+    cp /.pullsecret/.dockerconfigjson /kaniko/.docker/config.json
 
     ${cmd}
     """
