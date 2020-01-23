@@ -17,6 +17,7 @@ void call(Map opts = [:]) {
     println "[ace] - Got opts - ${parserOpts}"
 
     sh """
+    [ -d target-data ] && rm -rf target-data
     mkdir target-data
     python3 /app/ace-parser.py --ace ace.yaml --img-url ${opts.image} --output=target-data
     ls target-data
