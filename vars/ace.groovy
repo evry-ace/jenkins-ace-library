@@ -59,6 +59,7 @@ void call(Map options = [:], Object body) {
   Boolean shouldCleanup = options.shouldCleanup ?: true
 
   String confWorkspace = env.WORKSPACE_PATH ?: opts.workspace
+  println "[ace] Configured workspace: ${confWorkspace}"
 
   String workspace
   node(buildAgent) {
@@ -87,6 +88,7 @@ void call(Map options = [:], Object body) {
       shouldCleanup = false
       workspace = confWorkspace ?: '/home/jenkins/agent/workspace'
     }
+    println "[ace] Using workspace: ${workspace}"
 
     if (options.containers) {
       containers << options.containers
