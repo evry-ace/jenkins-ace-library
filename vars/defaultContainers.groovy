@@ -7,6 +7,7 @@ Map call() {
     terraform: cdImg,
     cd: cdImg,
     ace: 'evryace/ace-2-values:15',
+    jenkins: 'jenkins/jnlp-slave:alpine',
   ]
 
   return containers
