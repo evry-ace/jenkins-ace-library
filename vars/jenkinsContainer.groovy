@@ -1,5 +1,5 @@
 Object call(Map opts = [:]) {
-  String image = opts.img ?: 'jenkins/jnlp-slave:alpine'
+  String image = opts.img ?: defaultContainers().jenkins
 
   return containerTemplate(
     name: 'jenkins',
