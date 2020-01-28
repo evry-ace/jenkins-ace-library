@@ -225,7 +225,7 @@ void call(Map options = [:], Object body) {
               cd gitops
 
               git fetch -a
-              if `git branch -a 'remotes/origin/${pushToBranch}`; then
+              if `git branch -a 'remotes/origin/${pushToBranch}'`; then
                 git checkout ${pushToBranch}
               else
                 git checkout -b ${pushToBranch}
