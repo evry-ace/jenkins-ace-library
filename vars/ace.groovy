@@ -195,6 +195,11 @@ void call(Map options = [:], Object body) {
             target = readYaml file: 'target-data/target.yaml'
             cfg = readYaml file: 'ace.yaml'
             Map gitops = cfg.gitops ?: [:]
+            String gitopsRepo = gitops.repo ?: cfg.gitOpsRepo
+
+            if (!gitopsRepo) {
+              error("[ace] No gitops repo specified, dying.")
+            }
 
             helmPullChart(target.chart, aOpts)
 
