@@ -194,7 +194,7 @@ void call(Map options = [:], Object body) {
 
             target = readYaml file: 'target-data/target.yaml'
             cfg = readYaml file: 'ace.yaml'
-            target.gitops = cfg.gitops
+            target.gitops = cfg.gitops ?: [:]
 
             helmPullChart(target.chart, aOpts)
 
@@ -207,6 +207,8 @@ void call(Map options = [:], Object body) {
                 'https://', "https://${GIT_USER}:${GIT_TOKEN}@"
               )
 
+              String pushToBranch = target.gitops.initialBranch ?: 'test'
+
               sh """
               set -e
               set -u
@@ -216,7 +218,12 @@ void call(Map options = [:], Object body) {
 
               git clone ${origin} gitops
               cd gitops
-              git checkout test
+
+              if `git show-ref -q --heads ${pushToBranch}`; do
+                git checkout ${pushToBranch}
+              else
+                git checkout -b ${pushToBranch}
+              fi
 
               CHANGED=''
               [ ! -d "${target.name}" ] && {
