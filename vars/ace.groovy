@@ -224,7 +224,8 @@ void call(Map options = [:], Object body) {
               git clone ${origin} gitops
               cd gitops
 
-              if `git show-ref -q --heads ${pushToBranch}`; then
+              git fetch -a
+              if `git branch -a 'remotes/origin/${pushToBranch}`; then
                 git checkout ${pushToBranch}
               else
                 git checkout -b ${pushToBranch}
