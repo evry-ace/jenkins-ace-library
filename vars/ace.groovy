@@ -194,7 +194,7 @@ void call(Map options = [:], Object body) {
 
             target = readYaml file: 'target-data/target.yaml'
             cfg = readYaml file: 'ace.yaml'
-            target.gitops = cfg.gitops ?: [:]
+            Map gitops = cfg.gitops ?: [:]
 
             helmPullChart(target.chart, aOpts)
 
@@ -203,11 +203,11 @@ void call(Map options = [:], Object body) {
               usernameVariable: 'GIT_USER',
               passwordVariable: 'GIT_TOKEN')]
             ) {
-              String origin = target.gitops.replace(
+              String origin = gitops.replace(
                 'https://', "https://${GIT_USER}:${GIT_TOKEN}@"
               )
 
-              String pushToBranch = target.gitops.initialBranch ?: 'test'
+              String pushToBranch = gitops.pushToBranch ?: 'test'
 
               sh """
               set -e
