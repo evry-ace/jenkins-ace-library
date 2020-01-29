@@ -58,7 +58,7 @@ void call(Map options = [:], Object body) {
   Boolean allowStartupNotification = options.allowStartupNotification ?: false
   Boolean shouldCleanup = options.shouldCleanup ?: true
 
-  String confWorkspace = env.WORKSPACE_PATH ?: opts.workspace
+  String confWorkspace = env.WORKSPACE_PATH ?: options.workspace
   println "[ace] Configured workspace: ${confWorkspace}"
 
   String workspace
