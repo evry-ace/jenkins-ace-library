@@ -230,7 +230,7 @@ void call(Map options = [:], Object body) {
               git fetch -a
               """
 
-              gitCheckoutArgs = branchExists ? "-b ${pushToBranch}" : ""
+              gitCheckoutArgs = branchExists ? "" : "-b ${pushToBranch}"
               sh "cd gitops; git checkout ${gitCheckoutArgs}"
 
               sh """
