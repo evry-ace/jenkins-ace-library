@@ -234,6 +234,7 @@ void call(Map options = [:], Object body) {
               sh "cd gitops; git checkout ${gitCheckoutArgs}"
 
               sh """
+              cd gitops
               CHANGED=''
               [ ! -d "${target.name}" ] && {
                 cp -R ../target-data ${target.name}
