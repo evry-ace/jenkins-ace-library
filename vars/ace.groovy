@@ -213,6 +213,10 @@ void call(Map options = [:], Object body) {
               )
 
               String pushToBranch = gitops.pushToBranch ?: 'test'
+              String branches = sh(
+                script: "git branch -a", returnStdout: true).trim()
+
+              String branchExists = branches.contains("remotes/origin/${pushToBranch}")
 
               sh """
               set -e
@@ -223,14 +227,13 @@ void call(Map options = [:], Object body) {
 
               git clone ${origin} gitops
               cd gitops
-
               git fetch -a
-              if [ ! z "`git branch -a | grep 'remotes/origin/${pushToBranch}'`" ]; then
-                git checkout ${pushToBranch}
-              else
-                git checkout -b ${pushToBranch}
-              fi
+              """
 
+              gitCheckoutArgs = branchExists ? "-b" : ""
+              sh "cd gitops; git checkout ${gitCheckoutArgs}"
+
+              sh """
               CHANGED=''
               [ ! -d "${target.name}" ] && {
                 cp -R ../target-data ${target.name}
