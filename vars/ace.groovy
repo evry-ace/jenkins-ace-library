@@ -198,7 +198,7 @@ void call(Map options = [:], Object body) {
             String gitopsRepo = gitops.repo
 
             if (!gitopsRepo) {
-              error("[ace] No gitops repo specified, dying.")
+              error('[ace] No gitops repo specified, dying.')
             }
 
             helmPullChart(target.chart, aOpts)
@@ -214,7 +214,7 @@ void call(Map options = [:], Object body) {
 
               String pushToBranch = gitops.pushToBranch ?: 'test'
               String branches = sh(
-                script: "git branch -a", returnStdout: true).trim()
+                script: 'git branch -a', returnStdout: true).trim()
 
               String branchExists = branches.contains("remotes/origin/${pushToBranch}")
 
@@ -230,7 +230,7 @@ void call(Map options = [:], Object body) {
               git fetch -a
               """
 
-              gitCheckoutArgs = branchExists ? "" : "-b"
+              gitCheckoutArgs = branchExists ? '' : '-b'
               sh "cd gitops; git checkout ${gitCheckoutArgs} ${pushToBranch}"
 
               sh """
@@ -240,7 +240,7 @@ void call(Map options = [:], Object body) {
                 cp -R ../target-data ${target.name}
                 CHANGED=y
               } || {
-                [ ! -z "`diff -Naur ../target-data ${target.name}`" ] && {
+                [ ! -z "`diff -Naur ${target.name} ../target-data`" ] && {
                   CHANGED=y
                   rm -rf ${target.name}
                   cp -R ../target-data ${target.name}
