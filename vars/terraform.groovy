@@ -7,6 +7,8 @@ Object call(String environment, Map opts = [:], Object body) {
   Boolean init = opts.containsKey('init') ? opts.init : true
   String provider = opts.provider ?: 'azure'
 
+  print "[ace] tf provider: ${provider}, init: ${init}"
+
   String credsProvider = opts.credsProvider ?: 'jenkins'
 
   String path = opts.path ?: '.'
@@ -17,8 +19,7 @@ Object call(String environment, Map opts = [:], Object body) {
   List varfilesExtra = opts.varfilesExtra ?: []
   String varfiles = Terraform.varFiles(varfilesDir, varfilesDefault, varfilesExtra)
 
-  String defaultImage = 'ngeor/az-helm-kubectl-terraform:2.12.3__1.12.6__0.11.13'
-  String dockerImage = opts.dockerImage ?: defaultImage
+  String dockerImage = opts.dockerImage ?: defaultContainers().terraform
   List<String> dockerArgList = ["--entrypoint=''", "-e HELM_HOME=${env.WORKSPACE}"]
 
   String workspace = opts.workspace ?: environment
