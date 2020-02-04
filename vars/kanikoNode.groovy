@@ -1,6 +1,5 @@
 Object call(Map opts = [:], Object body) {
-  String defaultLabel = buildId('kaniko')
-  String label = opts.get('label', defaultLabel)
+  String label = opts.label ?: buildId('kaniko')
 
   kanikoPod(opts) {
     node(label) {

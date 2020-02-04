@@ -2,8 +2,7 @@ Object call(Map opts = [:], Object body) {
   String image = opts.image ?: defaultContainers().kaniko
   String secretName = opts.secretName ?: 'registry-credential'
 
-  String defaultLabel = buildId('kaniko')
-  String label = opts.get('label', defaultLabel)
+  String label = opts.label ?: buildId('kaniko')
 
   podTemplate(label: label,
     yaml: """
