@@ -60,6 +60,7 @@ void call(Map options = [:], Object body) {
 
   String confWorkspace = env.WORKSPACE_PATH ?: options.workspace
   println "[ace] Configured workspace: ${confWorkspace}"
+  println "[ace] Build agent: ${buildAgent}"
 
   String workspace
   node(buildAgent) {

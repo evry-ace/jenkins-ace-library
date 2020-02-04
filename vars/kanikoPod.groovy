@@ -3,8 +3,10 @@ Object call(Map opts = [:], Object body) {
   String secretName = opts.secretName ?: 'registry-credential'
 
   String label = opts.label ?: buildId('kaniko')
+  String inheritFrom = opts.inheritFrom ?: 'base'
 
   podTemplate(label: label,
+    inheritFrom: inheritFrom,
     yaml: """
     kind: Pod
     spec:
