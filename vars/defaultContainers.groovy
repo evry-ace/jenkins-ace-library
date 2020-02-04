@@ -8,6 +8,7 @@ Map call() {
     cd: cdImg,
     ace: 'evryace/ace-2-values:15',
     jenkins: 'jenkins/jnlp-slave:alpine',
+    kaniko: 'gcr.io/kaniko-project/executor:debug',
   ]
 
   return containers
