@@ -1,4 +1,4 @@
-Object kanikoPod(Map opts = [:], Object body) {
+Object call(Map opts = [:], Object body) {
   String image = opts.image ?: defaultContainers().kaniko
   String secretName = opts.secretName ?: 'registry-credential'
 
