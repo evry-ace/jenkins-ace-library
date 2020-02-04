@@ -10,6 +10,7 @@ void call(Map opts = [:]) {
   String dockerFile = opts.dockerFile ?: 'Dockerfile'
 
   String cache = opts.cache ? 'true' : 'false'
+  String copySecret = opts.copySecret ?: 'true'
 
   println "[ace] Building container with Kaniko - ${imageName}"
 
@@ -23,15 +24,25 @@ void call(Map opts = [:]) {
   ]
 
   String cmd = kanikoOpts.join(' ').trim()
-  println cmd
+
+  if (copySecret == 'true') {
+    container(name: 'kaniko', shell: '/busybox/sh') {
+      sh """
+      #!/busybox/sh
+
+      export PATH=/busybox:/kaniko:$PATH
+
+      mkdir -p /kaniko/.docker
+      cp /.pullsecret/.dockerconfigjson /kaniko/.docker/config.json
+      """
+    }
+  }
+
   container(name: 'kaniko', shell: '/busybox/sh') {
     sh """
     #!/busybox/sh
 
     export PATH=/busybox:/kaniko:$PATH
-
-    mkdir -p /kaniko/.docker
-    cp /.pullsecret/.dockerconfigjson /kaniko/.docker/config.json
 
     ${cmd}
     """
