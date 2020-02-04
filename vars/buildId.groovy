@@ -7,6 +7,9 @@
  * @return the buildid
  */
 String call(String prefix = '') {
-  String tmpl = "${prefix}${env.JOB_NAME}_${env.BUILD_NUMBER}"
-  return tmpl.replaceAll('-', '_').replaceAll('/', '_').replaceAll(' ', '_')
+  String job = env.JOB_NAME.repliceAll('/', '-')
+  String tmpl = "${prefix}${job}_${env.BUILD_NUMBER}"
+  String id = tmpl.replaceAll('_', '-').replaceAll('/', '-').replaceAll(' ', '-')
+  println "[ace] Build id - ${id}"
+  return id
 }
