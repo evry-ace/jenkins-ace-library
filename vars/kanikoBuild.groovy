@@ -12,7 +12,7 @@ void call(Map opts = [:]) {
   String cache = opts.cache ? 'true' : 'false'
   String copySecret = opts.copySecret ?: 'true'
 
-  println "[ace] Building container with Kaniko - ${imageName}"
+  println "[ace] Building container with Kaniko - ${imageName}, opts - ${opts}"
 
   List kanikoOpts = [
     '/kaniko/executor',
