@@ -1,5 +1,5 @@
 void call(Map opts = [:]) {
-  String image = opts.image ?: 'gcr.io/kaniko-project/executor:debug'
+  String image = opts.image ?: defaultContainers().kaniko
 
   return containerTemplate(
     name: 'kaniko',
