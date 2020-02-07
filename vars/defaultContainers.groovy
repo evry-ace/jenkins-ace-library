@@ -6,7 +6,7 @@ Map call() {
     helm: cdImg,
     terraform: cdImg,
     cd: cdImg,
-    ace: 'evryace/ace-2-values:15',
+    ace: 'evryace/ace-2-values:16',
     jenkins: 'jenkins/jnlp-slave:alpine',
     kaniko: 'gcr.io/kaniko-project/executor:debug-v0.16.0',
   ]
