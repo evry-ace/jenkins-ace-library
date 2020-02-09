@@ -81,7 +81,7 @@ void call(Map opts = []) {
       CHANGED=''
       [ ! -d "${targetFolder}" ] && {
         mkdir -p ${targetFolder}
-        cp -R ../target-data ${targetFolder}
+        cp -R ../target-data/* ${targetFolder}
         CHANGED=y
       } || {
         [ ! -z "`diff -Naur ${targetFolder} ../target-data`" ] && {
