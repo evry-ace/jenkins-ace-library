@@ -64,7 +64,7 @@ void call(Map opts = []) {
 
       if [ ! -z "\$CHANGED" ]; then
         git add .
-        git commit -m "Update from build - ${tag}"
+        git commit -m "Update from build - ${opts.tag}"
 
         git push origin test
       fi
@@ -93,7 +93,7 @@ void call(Map opts = []) {
       sh """
       if [ ! -z "\$CHANGED" ]; then
         git add .
-        git commit -m "Update from build - ${tag}"
+        git commit -m "Update from build - ${opts.tag}"
 
         git push origin test
       fi
