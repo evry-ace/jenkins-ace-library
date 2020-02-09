@@ -38,10 +38,10 @@ void call(Map opts = []) {
 
     if (strategy == "branch") {
       String pushToBranch = gitops.pushToBranch ?: 'test'
-        String branches = sh(
+
+      String branches = sh(
         script: 'cd gitops; git branch -a', returnStdout: true).trim()
       println "[ace] Got branches ${branches}"
-
       Boolean branchExists = branches.contains("remotes/origin/${pushToBranch}")
       println "[ace] Branch ${pushToBranch} exists."
 
@@ -70,6 +70,8 @@ void call(Map opts = []) {
       fi
       """
     } else if (strategy == "path") {
+      String pushToBranch = gitops.pushToBranch ?: 'master'
+
       String firstEnv = gitops.firstEnv ?: "test"
       String targetFolder = "${target.name}/${firstEnv}"
 
