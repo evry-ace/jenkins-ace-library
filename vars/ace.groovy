@@ -183,81 +183,10 @@ void call(Map options = [:], Object body) {
           }
 
           body.pushConfigToGit = { opts = [:] ->
-            aOpts = opts ?: [:]
-            aOpts.containers = aOpts.containers ?: containers
-
-            aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
-
-            String tag = body.ace.helm.image.split(':')[1]
-
-            generateAceValues(aOpts)
-
-            target = readYaml file: 'target-data/target.yaml'
-            cfg = readYaml file: 'ace.yaml'
-            Map gitops = cfg.gitops ?: [:]
-            String gitopsRepo = gitops.repo
-
-            if (!gitopsRepo) {
-              error('[ace] No gitops repo specified, dying.')
-            }
-
-            helmPullChart(target.chart, aOpts)
-
-            withCredentials([usernamePassword(
-              credentialsId: 'jenkins-git',
-              usernameVariable: 'GIT_USER',
-              passwordVariable: 'GIT_TOKEN')]
-            ) {
-              String origin = gitopsRepo.replace(
-                'https://', "https://${GIT_USER}:${GIT_TOKEN}@"
-              )
-
-              String pushToBranch = gitops.pushToBranch ?: 'test'
-
-              sh """
-              set -e
-              set -u
-
-              git config --global user.email jenkins@tietoevry.com
-              git config --global user.name "Jenkins the autonomous"
-
-              git clone ${origin} gitops
-              cd gitops
-              git fetch -a
-              """
-
-              String branches = sh(
-                script: 'cd gitops; git branch -a', returnStdout: true).trim()
-              println "[ace] Got branches ${branches}"
-
-              Boolean branchExists = branches.contains("remotes/origin/${pushToBranch}")
-              println "[ace] Branch ${pushToBranch} exists."
-
-              gitCheckoutArgs = branchExists ? '' : '-b'
-              sh "cd gitops; git checkout ${gitCheckoutArgs} ${pushToBranch}"
-
-              sh """
-              cd gitops
-              CHANGED=''
-              [ ! -d "${target.name}" ] && {
-                cp -R ../target-data ${target.name}
-                CHANGED=y
-              } || {
-                [ ! -z "`diff -Naur ${target.name} ../target-data`" ] && {
-                  CHANGED=y
-                  rm -rf ${target.name}
-                  cp -R ../target-data ${target.name}
-                }
-              }
-
-              if [ ! -z "\$CHANGED" ]; then
-                git add .
-                git commit -m "Update from build - ${tag}"
-
-                git push origin test
-              fi
-              """
-            }
+            opts.containers = aOpts.containers ?: containers
+            opts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
+            opts.tag = body.ace.helm.image.split(':')[1]
+            acepushConfigToGit(opts)
           }
         }
 
