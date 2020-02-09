@@ -66,7 +66,7 @@ void call(Map opts = []) {
         git add .
         git commit -m "Update from build - ${opts.tag}"
 
-        git push origin test
+        git push origin ${pushToBranch}
       fi
       """
     } else if (strategy == "path") {
@@ -88,14 +88,12 @@ void call(Map opts = []) {
           cp -R ../target-data ${targetFolder}
         }
       }
-      """
 
-      sh """
       if [ ! -z "\$CHANGED" ]; then
         git add .
         git commit -m "Update from build - ${opts.tag}"
 
-        git push origin test
+        git push origin ${pushToBranch}
       fi
       """
     }
