@@ -186,7 +186,7 @@ void call(Map options = [:], Object body) {
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
             aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
-            aOopts.tag = body.ace.helm.image.split(':')[1]
+            aOpts.tag = body.ace.helm.image.split(':')[1]
             acepushConfigToGit(aOpts)
           }
         }
