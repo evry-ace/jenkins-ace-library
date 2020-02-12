@@ -7,6 +7,7 @@ void call(Map opts = [:]) {
   String gitopsRepo = gitops.repo
   String strategy = gitops.strategy ?: "branch"
 
+  
   if (!gitopsRepo) {
     error('[ace] No gitops repo specified, dying.')
   }
