@@ -1,4 +1,4 @@
-void call(Map opts = []) {
+void call(Map opts = [:]) {
   generateAceValues(opts)
 
   target = readYaml file: 'target-data/target.yaml'
@@ -72,7 +72,7 @@ void call(Map opts = []) {
     } else if (strategy == "path") {
       String pushToBranch = gitops.pushToBranch ?: 'master'
 
-      String firstEnv = gitops.firstEnv ?: "test"
+      String firstEnv = opts.firstEnv ?: gitops.firstEnv ?: "test"
       String targetFolder = "${target.name}/${firstEnv}"
 
       sh """
