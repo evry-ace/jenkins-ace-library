@@ -21,6 +21,11 @@ void call(Map opts = [:]) {
     "--dockerfile=`pwd`/${dockerFile}",
     "--destination=${imageName}",
     "--cache=${cache}",
+
+    if(opts.buildArgs) {
+      "--build-arg=${opts.buildArgs}",
+    }
+
   ]
 
   String cmd = kanikoOpts.join(' ').trim()
