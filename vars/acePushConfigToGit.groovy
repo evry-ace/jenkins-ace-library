@@ -1,11 +1,12 @@
-void call(Map opts = []) {
+@SuppressWarnings(['MethodSize'])
+void call(Map opts = [:]) {
   generateAceValues(opts)
 
   target = readYaml file: 'target-data/target.yaml'
   cfg = readYaml file: 'ace.yaml'
   Map gitops = cfg.gitops ?: [:]
   String gitopsRepo = gitops.repo
-  String strategy = gitops.strategy ?: "branch"
+  String strategy = gitops.strategy ?: 'branch'
 
   if (!gitopsRepo) {
     error('[ace] No gitops repo specified, dying.')
@@ -36,7 +37,7 @@ void call(Map opts = []) {
     git fetch -a
     """
 
-    if (strategy == "branch") {
+    if (strategy == 'branch') {
       String pushToBranch = gitops.pushToBranch ?: 'test'
 
       String branches = sh(
@@ -69,10 +70,10 @@ void call(Map opts = []) {
         git push origin ${pushToBranch}
       fi
       """
-    } else if (strategy == "path") {
+    } else if (strategy == 'path') {
       String pushToBranch = gitops.pushToBranch ?: 'master'
 
-      String firstEnv = gitops.firstEnv ?: "test"
+      String firstEnv = opts.firstEnv ?: gitops.firstEnv ?: 'test'
       String targetFolder = "${target.name}/${firstEnv}"
 
       sh """
