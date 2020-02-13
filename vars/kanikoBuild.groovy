@@ -12,9 +12,9 @@ void call(Map opts = [:]) {
   String cache = opts.cache ? 'true' : 'false'
   String copySecret = opts.copySecret ?: 'true'
 
-  String buildArgs = opts.buildArgs ? "--build-arg ${opts.buildArgs}" : ''
+  String buildArgs = opts.buildArgs ? '--build-arg "${opts.buildArgs}"' : ''
 
-  println "[ace] Building container with Kaniko - ${imageName}, opts - ${opts} - and build arguments - ${buildArgs}"
+  println '[ace] Building container with Kaniko - ${imageName}, opts - ${opts} - and build arguments - ${buildArgs}'
 
   List kanikoOpts = [
     '/kaniko/executor',
@@ -23,6 +23,7 @@ void call(Map opts = [:]) {
     "--dockerfile=`pwd`/${dockerFile}",
     "--destination=${imageName}",
     "--cache=${cache}",
+    "${buildArgs}"
   ]
 
   String cmd = kanikoOpts.join(' ').trim()
