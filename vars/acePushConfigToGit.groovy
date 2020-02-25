@@ -6,7 +6,7 @@ void call(Map opts = [:]) {
   cfg = readYaml file: 'ace.yaml'
   Map gitops = cfg.gitops ?: [:]
   String gitopsRepo = gitops.repo
-  String strategy = gitops.strategy ?: 'branch'
+  String strategy = gitops.strategy ?: 'path'
 
   if (!gitopsRepo) {
     error('[ace] No gitops repo specified, dying.')
