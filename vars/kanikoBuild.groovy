@@ -11,6 +11,7 @@ void call(Map opts = [:]) {
 
   String cache = opts.cache ? 'true' : 'false'
   String copySecret = opts.copySecret ?: 'true'
+  String extraArgs = opts.extraArgs ?: ''
 
   println "[ace] Building container with Kaniko - ${imageName}, opts - ${opts}"
 
@@ -21,6 +22,7 @@ void call(Map opts = [:]) {
     "--dockerfile=`pwd`/${dockerFile}",
     "--destination=${imageName}",
     "--cache=${cache}",
+    extraArgs
   ]
 
   String cmd = kanikoOpts.join(' ').trim()
