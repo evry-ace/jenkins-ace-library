@@ -35,7 +35,7 @@ class Slack implements Serializable {
       String commitAuthor = commitAuthor()
       subject = "${buildStatus}: Job ${jobName} build #${buildNum} by ${commitAuthor}"
     } else {
-      subject = "${buildStatus}: ${subject}"
+      subject = "${buildStatus}: ${buildSubject}"
     }
 
     if (buildStatus == 'PENDING INPUT') {
