@@ -3,7 +3,7 @@
 import no.ace.Terraform
 
 @SuppressWarnings(['MethodSize', 'UnnecessaryObjectReferences'])
-Object call(String environment, Map opts = [:], Object body) {
+void call(String environment, Map opts = [:], Object body) {
   Boolean init = opts.containsKey('init') ? opts.init : true
   String provider = opts.provider ?: 'azure'
 

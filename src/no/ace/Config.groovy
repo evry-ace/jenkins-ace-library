@@ -62,6 +62,6 @@ class Config {
       }
     }
 
-    result
+    return result
   }
 }

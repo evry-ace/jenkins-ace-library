@@ -5,7 +5,7 @@ Object call(Map opts = [:], Object body) {
   String defaultLabel = buildId('kaniko')
   String label = opts.get('label', defaultLabel)
 
-  podTemplate(label: label,
+  return podTemplate(label: label,
     yaml: """
     kind: Pod
     spec:
