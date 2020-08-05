@@ -4,9 +4,7 @@ package no.ace
 class NoopNotifier implements Serializable {
   Object script
 
-  NoopNotifier(
-    Object script
-  ) {
+  NoopNotifier(Object script) {
     this.script = script
   }
 

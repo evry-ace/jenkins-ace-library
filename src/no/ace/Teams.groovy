@@ -6,11 +6,7 @@ class Teams implements Serializable {
   String notificationsWebhookUrl
   String alertsWebhookUrl
 
-  Teams(
-    Object script,
-    String notificationsWebhookUrl,
-    String alertsWebhookUrl = null
-  ) {
+  Teams(Object script, String notificationsWebhookUrl, String alertsWebhookUrl = null) {
     this.script = script
     this.notificationsWebhookUrl = notificationsWebhookUrl
     this.alertsWebhookUrl = alertsWebhookUrl

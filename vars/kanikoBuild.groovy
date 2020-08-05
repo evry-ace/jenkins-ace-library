@@ -22,7 +22,7 @@ void call(Map opts = [:]) {
     "--dockerfile=`pwd`/${dockerFile}",
     "--destination=${imageName}",
     "--cache=${cache}",
-    extraArgs
+    extraArgs,
   ]
 
   String cmd = kanikoOpts.join(' ').trim()
