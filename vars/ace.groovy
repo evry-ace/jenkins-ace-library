@@ -105,7 +105,7 @@ void call(Map options = [:], Object body) {
 
           if (dockerSet) {
             body.ace.helm = body.ace.helm ?: [:]
-            body.ace.helm.image = new Docker(this).image()
+            body.ace.helm.image = body.ace.helm.image ?: new Docker(this).image()
             println "[ace] Generated image name: ${body.ace.helm.image}"
           }
 
