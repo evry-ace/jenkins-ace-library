@@ -154,14 +154,15 @@ void call(Map options = [:], Object body) {
           }
 
           body.kaniko = { opts = [:] ->
-            opts.registry = opts.registry ?: body.ace.helm.registry
+            aOpts = opts ?: [:]
+            aOpts.registry = aOpts.registry ?: body.ace.helm.registry
 
             List<String> namePart = body.ace.helm.image.split(':')
 
-            opts.name = opts.name ?: namePart[0]
-            opts.tag = opts.tag ?: namePart[1]
+            aOpts.name = aOpts.name ?: namePart[0]
+            aOpts.tag = aOpts.tag ?: namePart[1]
 
-            kanikoBuild(opts)
+            kanikoBuild(aOpts)
           }
 
           body.scanWithTwistlock = { opts = [:] ->
