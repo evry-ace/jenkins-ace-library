@@ -13,6 +13,7 @@ void call(Map opts = [:]) {
     error('[ace] No gitops repo specified, dying.')
   }
 
+
   withCredentials([usernamePassword(
     credentialsId: 'jenkins-git',
     usernameVariable: 'GIT_USER',
@@ -32,12 +33,14 @@ void call(Map opts = [:]) {
     git clone ${origin} gitops
     """
 
-    Map values = readYaml file: "gitops/${folderName}/${env}/values.yaml"
+    String valuesFile = "gitops/${folderName}/${env}/values.yaml"
+    println("[ace] Looking for tag ${tag} in ${valuesFile}")
+
+    Map values = readYaml file: valuesFile
     String currentTag = values[name].image.tag
     if (currentTag != tag) {
       sh """
-      cd gitops/${folderName}/${env}
-      sed -i "s/tag:.*/tag: ${tag}/g" values.yaml
+      sed -i "s/tag:.*/tag: ${tag}/g" ${valuesFile}
       """
 
       println "[ace] Image tag will be updated from ${currentTag} > ${tag}"
