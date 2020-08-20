@@ -1,10 +1,10 @@
 @SuppressWarnings(['MethodSize'])
 void call(Map opts = [:]) {
   Map gitops = opts.gitops ?: [:]
-  String gitopsRepo = gitops.repo
 
   String name = opts.name
-  String folderName = opts.folderName ?: name
+  String gitopsRepo = gitops.repo
+  String gitopsFolder = gitops.gitopsFolder ?: name
 
   String tag = opts.tag
   String env = opts.env ?: 'test'
@@ -33,14 +33,14 @@ void call(Map opts = [:]) {
     git clone ${origin} gitops
     """
 
-    String valuesFile = "gitops/${folderName}/${env}/values.yaml"
+    String valuesFile = "gitops/${gitopsFolder}/${env}/values.yaml"
     println("[ace] Looking for tag ${tag} in ${valuesFile}")
 
     Map values = readYaml file: valuesFile
     String currentTag = values[name].image.tag
     if (currentTag != tag) {
       sh """
-      sed -i "s/tag:.*/tag: ${tag}/g" ${valuesFile}
+      sed -i 's/tag:.*/tag: \\"${tag}\\"/g' ${valuesFile}
       """
 
       println "[ace] Image tag will be updated from ${currentTag} > ${tag}"
