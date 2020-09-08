@@ -187,14 +187,14 @@ void call(Map options = [:], Object body) {
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
             aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
-            aOpts.tag = body.ace.helm.image.split(':')[1]
+            aOpts.tag = "${body.ace.helm.image.split(':')[1]}"
             acePushConfigToGit(aOpts)
           }
 
           body.updateImageTagInGit = { opts = [:] ->
             aOpts = opts ?: [:]
             aOpts.name = body.ace.name
-            aOpts.tag = body.ace.helm.image.split(':')[1]
+            aOpts.tag = "${body.ace.helm.image.split(':')[1]}"
             aOpts.gitops = body.ace.gitops
 
             aceUpdateImageTagInGit(aOpts)
