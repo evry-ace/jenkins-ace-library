@@ -5,6 +5,7 @@
 void call(Map opts = [:]) {
   Map containers = opts.containers ?: [:]
   String parserContainer = containers.ace ?: ''
+  String aceFile = opts.aceFile ?: 'ace.yaml'
 
   List<String> parserOpts = [
     "-v ${pwd()}:/src",
@@ -19,7 +20,7 @@ void call(Map opts = [:]) {
     sh """
     [ -d target-data ] && rm -rf target-data
     mkdir target-data
-    python3 /app/ace-parser.py --ace ace.yaml --img-url ${opts.image} --output=target-data
+    python3 /app/ace-parser.py --ace ${aceFile} --img-url ${opts.image} --output=target-data
     ls target-data
     """
   }

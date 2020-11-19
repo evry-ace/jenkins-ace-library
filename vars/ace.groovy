@@ -144,6 +144,7 @@ void call(Map options = [:], Object body) {
           body.deploy = { envName, opts = [:] ->
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
+            aOpts.aceFile = opts.aceFile ?: aceFile
             aOpts << [chat: body.chat, debug: debug]
 
             aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
@@ -177,6 +178,7 @@ void call(Map options = [:], Object body) {
           body.generateValues = { opts = [:] ->
             aOpts = opts ?: [:]
             aOpts.containers = aOpts.containers ?: containers
+            aOpts.aceFile = opts.aceFile ?: aceFile
 
             aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
 
@@ -188,6 +190,7 @@ void call(Map options = [:], Object body) {
             aOpts.containers = aOpts.containers ?: containers
             aOpts.image = "${body.ace.helm.registry}/${body.ace.helm.image}"
             aOpts.tag = "${body.ace.helm.image.split(':')[1]}"
+            aOpts.aceFile = opts.aceFile ?: aceFile
             acePushConfigToGit(aOpts)
           }
 
