@@ -10,6 +10,7 @@ void call(String chart, Map opts = [:]) {
       set -u
       set -e
 
+      rm -rf chart
       mkdir chart
 
       # Set Helm Home
