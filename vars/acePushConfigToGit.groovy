@@ -32,6 +32,7 @@ void call(Map opts = [:]) {
     git config --global user.email jenkins@tietoevry.com
     git config --global user.name "Jenkins the autonomous"
 
+    rm -rf gitops
     git clone ${origin} gitops
     cd gitops
     git fetch -a
