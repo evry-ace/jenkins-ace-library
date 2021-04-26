@@ -1,4 +1,4 @@
-void call(String chart, Map opts = [:]) {
+void call(String chart, String helmChartVersion, Map opts = [:]) {
   Map containers = opts.containers ?: [:]
   String helmContainer = containers.helm ?: ''
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
@@ -21,7 +21,7 @@ void call(String chart, Map opts = [:]) {
       helm repo add ace https://evry-ace.github.io/helm-charts
       helm repo update
 
-      helm pull ${chart} --untar -d chart
+      helm pull ${chart} --untar -d chart  -version ${helmChartVersion}
       mv chart/${chart.split('/')[1]}/* target-data
     """
   }

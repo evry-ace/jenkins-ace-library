@@ -7,6 +7,8 @@ void call(Map opts = [:]) {
   Map gitops = cfg.gitops ?: [:]
   String gitopsRepo = gitops.repo
   String strategy = gitops.strategy ?: 'path'
+  String helmChart = target.chart
+  String helmChartVersion = target.version
 
   if (!gitopsRepo) {
     error('[ace] No gitops repo specified, dying.')
@@ -14,7 +16,8 @@ void call(Map opts = [:]) {
 
   print "[ace] gitops repo strategy is ${strategy}"
 
-  helmPullChart(target.chart, opts)
+
+  helmPullChart(helmChart, helmChartVersion, opts)
 
   withCredentials([usernamePassword(
     credentialsId: 'jenkins-git',
