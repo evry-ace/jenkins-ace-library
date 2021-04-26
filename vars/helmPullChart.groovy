@@ -21,7 +21,7 @@ void call(String chart, String helmChartVersion, Map opts = [:]) {
       helm repo add ace https://evry-ace.github.io/helm-charts
       helm repo update
 
-      helm pull ${chart} --untar -d chart  -version ${helmChartVersion}
+      helm pull ${chart} --version ${helmChartVersion} --untar -d chart
       mv chart/${chart.split('/')[1]}/* target-data
     """
   }
