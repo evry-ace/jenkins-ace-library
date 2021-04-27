@@ -8,7 +8,7 @@ void call(Map opts = [:]) {
   String gitopsRepo = gitops.repo
   String strategy = gitops.strategy ?: 'path'
   String helmChart = target.chart
-  String helmChartVersion = target.version
+  String helmChartVersion = target.version ?: ''
 
   if (!gitopsRepo) {
     error('[ace] No gitops repo specified, dying.')
@@ -17,7 +17,7 @@ void call(Map opts = [:]) {
   print "[ace] gitops repo strategy is ${strategy}"
 
 
-  helmPullChart(helmChart, helmChartVersion, opts)
+  helmPullChart(helmChart, opts, helmChartVersion)
 
   withCredentials([usernamePassword(
     credentialsId: 'jenkins-git',
