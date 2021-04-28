@@ -3,6 +3,7 @@ void call(String chart, Map opts = [:]) {
   String helmContainer = containers.helm ?: ''
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
 
+  println "[ace] - The function helmPullChart is deprecated. You should use helmPullChart2 instead.""
   println "[ace] - Got containers - ${containers}"
 
   aceContainerWrapper(helmContainer, helmOpts, [:]) {
