@@ -14,7 +14,7 @@ void call(Map opts = [:]) {
 
   print "[ace] gitops repo strategy is ${strategy}"
 
-  helmPullChart(target.chart, opts)
+  helmPullChart(target, opts)
 
   withCredentials([usernamePassword(
     credentialsId: 'jenkins-git',
