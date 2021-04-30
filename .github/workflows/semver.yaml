@@ -19,3 +19,4 @@ jobs:
         WITH_V: true   
         DEFAULT_BUMP: none
         INITIAL_VERSION: 0.5.0
+
