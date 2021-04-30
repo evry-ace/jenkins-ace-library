@@ -3,8 +3,8 @@ void call(Map target, Map opts = [:]) {
   String helmContainer = containers.helm ?: ''
   List<String> helmOpts = opts.helmOpts ?: ["--entrypoint=''"]
   String chart = target.chart
-  String repo = target.repo ?: https://evry-ace.github.io/helm-charts
-  String repoName = target.repoName ?: ace
+  String repo = target.repo ?: 'https://evry-ace.github.io/helm-charts'
+  String repoName = target.repoName ?: 'ace'
   String version = target.version ?: ''
 
   if (!chart) {
