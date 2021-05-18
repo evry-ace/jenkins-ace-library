@@ -4,7 +4,7 @@ void call(Map opts = [:]) {
 
   target = readYaml file: 'target-data/target.yaml'
   cfg = readYaml file: opts.aceFile ?: 'ace.yaml'
-  sh "gitOpsfolder=$(mktemp -d gitOpsXXXXXX)"
+  sh "gitOpsfolder=\$(mktemp -d gitOpsXXXXXX)"
   Map gitops = cfg.gitops ?: [:]
   String gitopsRepo = gitops.repo
   String strategy = gitops.strategy ?: 'path'
